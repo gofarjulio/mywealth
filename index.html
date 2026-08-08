@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · MyWealth</title>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('mw_theme') || 'light');</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body data-page="dashboard">
+<div class="app-shell">
+  <aside class="sidebar d-none d-lg-block" id="sidebarDesktop"></aside>
+  <div class="main-wrap">
+    <header class="topnav" id="topnav"></header>
+    <main class="main-content" id="pageContent">
+
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-xl-3">
+          <div class="mw-card stat-tile">
+            <div class="stat-top">
+              <span class="stat-label">Total Pemasukan</span>
+              <span class="stat-icon icon-badge-income"><i class="bi bi-arrow-down-left"></i></span>
+            </div>
+            <div class="stat-value" id="statIncome">Rp0</div>
+            <div class="stat-delta" id="statIncomeDelta"></div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="mw-card stat-tile">
+            <div class="stat-top">
+              <span class="stat-label">Total Pengeluaran</span>
+              <span class="stat-icon icon-badge-expense"><i class="bi bi-arrow-up-right"></i></span>
+            </div>
+            <div class="stat-value" id="statExpense">Rp0</div>
+            <div class="stat-delta" id="statExpenseDelta"></div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="mw-card stat-tile">
+            <div class="stat-top">
+              <span class="stat-label">Saldo Periode Ini</span>
+              <span class="stat-icon icon-badge-balance"><i class="bi bi-wallet2"></i></span>
+            </div>
+            <div class="stat-value" id="statBalance">Rp0</div>
+            <div class="stat-delta" id="statBalanceDelta"></div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="mw-card stat-tile">
+            <div class="stat-top">
+              <span class="stat-label">Total Aset Keluarga</span>
+              <span class="stat-icon icon-badge-asset"><i class="bi bi-gem"></i></span>
+            </div>
+            <div class="stat-value" id="statAssets">Rp0</div>
+            <div class="stat-delta flat" id="statAssetsSub">Aset dikurangi hutang</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-lg-7">
+          <div class="mw-card h-100">
+            <div class="mw-card-header">
+              <div>
+                <h3>Transaksi Terakhir</h3>
+                <div class="subtitle">8 transaksi terbaru dari seluruh akun</div>
+              </div>
+              <a href="transaksi.html" class="btn btn-sm btn-outline-secondary">Lihat Semua</a>
+            </div>
+            <div class="table-responsive">
+              <table class="mw-table">
+                <thead><tr><th>Tanggal</th><th>Kategori</th><th>Akun</th><th class="text-end">Jumlah</th></tr></thead>
+                <tbody id="recentTxBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state d-none" id="recentTxEmpty"><i class="bi bi-inbox"></i>Belum ada transaksi.</div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="mw-card h-100">
+            <div class="mw-card-header">
+              <div>
+                <h3>Pengeluaran per Kategori</h3>
+                <div class="subtitle" id="quickChartSubtitle">Periode berjalan</div>
+              </div>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+              <div style="max-width:220px;width:100%;"><canvas id="quickChartCanvas" height="220"></canvas></div>
+            </div>
+            <ul class="mw-legend mt-3" id="quickChartLegend"></ul>
+            <div class="empty-state d-none" id="quickChartEmpty"><i class="bi bi-pie-chart"></i>Belum ada pengeluaran periode ini.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mw-card">
+        <div class="mw-card-header">
+          <div>
+            <h3>Saldo per Akun</h3>
+            <div class="subtitle">Ringkasan seluruh dompet dan aset</div>
+          </div>
+          <a href="akun.html" class="btn btn-sm btn-outline-secondary">Kelola Akun</a>
+        </div>
+        <div class="d-flex gap-3" style="overflow-x:auto;" id="accountsStrip"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="offcanvasHost"></div>
+<div id="quickAddModalHost"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/format.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

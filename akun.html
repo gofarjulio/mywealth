@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akun & Aset · MyWealth</title>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('mw_theme') || 'light');</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body data-page="akun">
+<div class="app-shell">
+  <aside class="sidebar d-none d-lg-block" id="sidebarDesktop"></aside>
+  <div class="main-wrap">
+    <header class="topnav" id="topnav"></header>
+    <main class="main-content" id="pageContent">
+
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-4">
+          <div class="mw-card stat-tile">
+            <div class="stat-top"><span class="stat-label">Total Aset</span><span class="stat-icon icon-badge-asset"><i class="bi bi-gem"></i></span></div>
+            <div class="stat-value" id="totalAssetsVal">Rp0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="mw-card stat-tile">
+            <div class="stat-top"><span class="stat-label">Total Hutang</span><span class="stat-icon icon-badge-expense"><i class="bi bi-credit-card"></i></span></div>
+            <div class="stat-value" id="totalLiabilitiesVal">Rp0</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="mw-card stat-tile net-worth-banner">
+            <div class="stat-top"><span class="stat-label">Kekayaan Bersih</span><span class="stat-icon icon-badge-balance"><i class="bi bi-graph-up"></i></span></div>
+            <div class="stat-value" id="netWorthVal">Rp0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary d-flex align-items-center gap-2" id="addAccountBtn" style="border-radius:10px;"><i class="bi bi-plus-lg"></i>Tambah Akun</button>
+      </div>
+
+      <div id="accountGroups"></div>
+
+    </main>
+  </div>
+</div>
+<div id="offcanvasHost"></div>
+<div id="quickAddModalHost"></div>
+
+<!-- Add/Edit Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="accountModalTitle">Tambah Akun</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="accountForm">
+        <div class="modal-body d-flex flex-column gap-3">
+          <input type="hidden" id="accId">
+          <div><label class="form-label">Nama Akun</label><input type="text" class="form-control" id="accName" placeholder="cth: BCA Tabungan" required></div>
+          <div><label class="form-label">Grup</label>
+            <select class="form-select" id="accGroup">
+              <option value="Kas & Bank">Kas & Bank</option>
+              <option value="Dompet Digital">Dompet Digital (E-Wallet)</option>
+              <option value="Aset & Investasi">Aset & Investasi</option>
+              <option value="Kartu Kredit/Hutang">Kartu Kredit/Hutang</option>
+            </select>
+          </div>
+          <div id="accBalanceWrap">
+            <label class="form-label">Saldo Awal</label>
+            <div class="rp-input-group"><span class="rp-prefix">Rp</span><input type="text" inputmode="numeric" class="form-control" id="accBalance" placeholder="0"></div>
+            <div class="form-text" id="accBalanceHint"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-danger me-auto d-none" id="accDeleteBtn"><i class="bi bi-trash3 me-1"></i>Hapus</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Adjust Balance Modal -->
+<div class="modal fade" id="adjustModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sesuaikan Saldo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="adjustForm">
+        <div class="modal-body d-flex flex-column gap-3">
+          <input type="hidden" id="adjAccId">
+          <div class="text-secondary-mw" id="adjAccName" style="font-weight:600;"></div>
+          <div class="text-muted-mw" style="font-size:13px;">Saldo saat ini: <span id="adjCurrentBalance"></span></div>
+          <div><label class="form-label">Saldo Aktual Sekarang</label>
+            <div class="rp-input-group"><span class="rp-prefix">Rp</span><input type="text" inputmode="numeric" class="form-control" id="adjNewBalance" required></div>
+          </div>
+          <div><label class="form-label">Catatan</label><input type="text" class="form-control" id="adjNote" placeholder="cth: Selisih hasil cek fisik"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Penyesuaian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/format.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/akun.js"></script>
+</body>
+</html>

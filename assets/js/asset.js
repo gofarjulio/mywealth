@@ -16,6 +16,7 @@
   };
   var CATEGORY_ORDER = ['cash', 'investment', 'fixed', 'debt_short', 'debt_long'];
   var CATEGORY_SLOT = { cash: 1, investment: 3, fixed: 4, debt_short: 8, debt_long: 5 };
+  var CATEGORY_ICON = { cash: 'bi-cash-stack', investment: 'bi-graph-up-arrow', fixed: 'bi-house', debt_short: 'bi-credit-card', debt_long: 'bi-credit-card-2-front' };
 
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
   function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
@@ -223,10 +224,81 @@
     });
   }
 
+  // ---------------- History tab ----------------
+  function historyGroupByDay() {
+    var snaps = Store.getAssetSnapshots().slice().sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); });
+    var groups = [];
+    var byDate = {};
+    snaps.forEach(function (s) {
+      var dateKey = s.createdAt.slice(0, 10);
+      if (!byDate[dateKey]) {
+        byDate[dateKey] = { date: dateKey, items: [] };
+        groups.push(byDate[dateKey]);
+      }
+      byDate[dateKey].items.push(s);
+    });
+    return groups;
+  }
+
+  function historyRowHTML(s) {
+    var account = Store.getAssetAccounts().find(function (a) { return a.id === s.accountId; });
+    var author = Store.findMember(s.createdBy);
+    var d = new Date(s.createdAt);
+    var metaParts = [pad2(d.getHours()) + ':' + pad2(d.getMinutes())];
+    metaParts.push(account ? CATEGORY_LABELS[account.category] : 'Unknown category');
+    if (author) metaParts.push(author.name);
+    var slot = account ? CATEGORY_SLOT[account.category] : 8;
+    var icon = account ? CATEGORY_ICON[account.category] : 'bi-question-circle';
+    return '<div class="asset-history-row">' +
+      '<span class="cat-icon-circle" style="background:var(--series-' + slot + ')"><i class="bi ' + icon + '"></i></span>' +
+      '<div class="asset-history-main">' +
+      '<div class="asset-history-name">' + Fmt.escapeHTML(account ? account.name : 'Deleted account') + '</div>' +
+      '<div class="asset-history-meta">' + metaParts.join(' &middot; ') + '</div>' +
+      '</div>' +
+      '<div class="asset-history-amount">' + Fmt.formatRupiah(s.amount) + '</div>' +
+      '<button class="asset-del-btn" data-snap-id="' + s.id + '" title="Delete"><i class="bi bi-trash3"></i></button>' +
+      '</div>';
+  }
+
+  function historyDayGroupHTML(g) {
+    return '<div class="tx-day">' +
+      '<div class="tx-day-head">' +
+      '<span class="tx-day-dom">' + Fmt.dayOfMonth(g.date) + '</span>' +
+      '<span class="tx-day-dow-badge">' + Fmt.formatDayAbbr(g.date) + '</span>' +
+      '<span class="tx-day-monthyear">' + Fmt.formatMonthYearNumeric(g.date) + '</span>' +
+      '</div>' +
+      '<div class="tx-day-items">' + g.items.map(historyRowHTML).join('') + '</div>' +
+      '</div>';
+  }
+
+  function renderHistory() {
+    var groups = historyGroupByDay();
+    var host = document.getElementById('assetHistoryList');
+    var empty = document.getElementById('assetHistoryEmpty');
+    if (!groups.length) {
+      host.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    host.innerHTML = groups.map(historyDayGroupHTML).join('');
+    host.querySelectorAll('[data-snap-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Delete this update entry?')) return;
+        try {
+          await Store.deleteAssetSnapshot(btn.getAttribute('data-snap-id'));
+        } catch (err) {
+          alert('Failed to delete: ' + (err.message || err));
+        }
+      });
+    });
+  }
+
   // ---------------- Tab switching ----------------
   function renderActiveTab() {
     if (activeTab === 'progress') renderProgress();
-    else renderUpdateTab();
+    else if (activeTab === 'update') renderUpdateTab();
+    else if (activeTab === 'history') renderHistory();
   }
 
   function switchTab(tab) {
@@ -236,6 +308,7 @@
     });
     document.getElementById('tabProgress').classList.toggle('d-none', tab !== 'progress');
     document.getElementById('tabUpdate').classList.toggle('d-none', tab !== 'update');
+    document.getElementById('tabHistory').classList.toggle('d-none', tab !== 'history');
     renderActiveTab();
   }
 

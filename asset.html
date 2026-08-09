@@ -25,6 +25,7 @@
       <div class="tx-tabs" id="assetTabs">
         <button class="tx-tab active" data-tab="progress">Progress</button>
         <button class="tx-tab" data-tab="update">Update</button>
+        <button class="tx-tab" data-tab="history">History</button>
       </div>
 
       <div class="tx-tabpane" id="tabProgress">
@@ -111,6 +112,14 @@
               <button class="btn btn-sm btn-primary w-100" type="submit"><i class="bi bi-plus-lg"></i></button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div class="tx-tabpane d-none" id="tabHistory">
+        <div class="mw-card">
+          <div class="mw-card-header"><h3>Update History</h3></div>
+          <div id="assetHistoryList"></div>
+          <div class="empty-state d-none" id="assetHistoryEmpty"><i class="bi bi-clock-history"></i>No updates logged yet.</div>
         </div>
       </div>
 

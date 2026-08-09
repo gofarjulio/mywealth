@@ -494,6 +494,13 @@
     notify('asset-snapshot-added');
   }
 
+  async function deleteAssetSnapshot(id) {
+    var res = await sb.from('asset_snapshots').delete().eq('id', id);
+    if (res.error) throw res.error;
+    await fetchAssetData();
+    notify('asset-snapshot-deleted');
+  }
+
   global.MW = global.MW || {};
   global.MW.Store = {
     init: init, getState: getState, logout: logout,
@@ -508,7 +515,7 @@
     getBudgets: getBudgets, getBudget: getBudget, setBudget: setBudget,
     setNetWorthTarget: setNetWorthTarget,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
-    addAssetAccount: addAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots,
+    addAssetAccount: addAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO
   };
 })(window);

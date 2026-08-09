@@ -223,10 +223,11 @@
     });
 
     var daysInMonth = new Date(periodYear, periodMonth + 1, 0).getDate();
-    var startOffset = new Date(periodYear, periodMonth, 1).getDay();
+    var jsStartDay = new Date(periodYear, periodMonth, 1).getDay();
+    var startOffset = (jsStartDay + 6) % 7; // 0=Senin ... 6=Minggu
     var todayIso = Store.todayISO();
 
-    var cells = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(function (d) {
+    var cells = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(function (d) {
       return '<div class="cal-dow">' + d + '</div>';
     }).join('');
     for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
@@ -240,6 +241,9 @@
         '</div>' : '';
       cells += '<div class="' + cls + '" data-date="' + iso + '"><div class="cal-daynum">' + day + '</div>' + amtHtml + '</div>';
     }
+    var totalCells = startOffset + daysInMonth;
+    var trailing = (7 - (totalCells % 7)) % 7;
+    for (var j = 0; j < trailing; j++) cells += '<div class="cal-cell empty"></div>';
     var grid = document.getElementById('calGrid');
     grid.innerHTML = cells;
     grid.querySelectorAll('.cal-cell[data-date]').forEach(function (cell) {

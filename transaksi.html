@@ -95,27 +95,22 @@
       </div>
 
       <div class="tx-tabpane d-none" id="tabTotal">
-        <div class="row g-3">
-          <div class="col-6 col-md-4">
-            <div class="mw-card stat-tile">
-              <div class="stat-top"><span class="stat-label">Total Income</span><span class="stat-icon icon-badge-income"><i class="bi bi-arrow-down-left"></i></span></div>
-              <div class="stat-value" id="totIncomeVal">Rp0</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="mw-card stat-tile">
-              <div class="stat-top"><span class="stat-label">Total Expenses</span><span class="stat-icon icon-badge-expense"><i class="bi bi-arrow-up-right"></i></span></div>
-              <div class="stat-value" id="totExpenseVal">Rp0</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="mw-card stat-tile">
-              <div class="stat-top"><span class="stat-label">Balance</span><span class="stat-icon icon-badge-balance"><i class="bi bi-wallet2"></i></span></div>
-              <div class="stat-value" id="totBalanceVal">Rp0</div>
-            </div>
+        <div class="mw-card mb-3">
+          <div class="tx-summary-row">
+            <div class="tx-summary-item"><div class="tx-summary-label">Income</div><div class="tx-summary-value up" id="totIncomeVal">Rp0</div></div>
+            <div class="tx-summary-item"><div class="tx-summary-label">Expenses</div><div class="tx-summary-value down" id="totExpenseVal">Rp0</div></div>
+            <div class="tx-summary-item"><div class="tx-summary-label">Total</div><div class="tx-summary-value" id="totBalanceVal">Rp0</div></div>
           </div>
         </div>
-        <div class="form-text mt-2">Follows the active filters above.</div>
+
+        <div class="mw-card">
+          <div class="mw-card-header">
+            <div class="d-flex align-items-center gap-2"><i class="bi bi-wallet2" style="font-size:18px;"></i><h3 class="mb-0">Budget</h3></div>
+            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#budgetSettingModal">Budget Setting<i class="bi bi-chevron-right"></i></button>
+          </div>
+          <div id="budgetList"></div>
+          <div class="empty-state d-none" id="budgetEmpty"><i class="bi bi-wallet2"></i>No budgets set yet. Use Budget Setting to add one.</div>
+        </div>
       </div>
 
       <div class="tx-tabpane d-none" id="tabNote">
@@ -179,6 +174,25 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary me-auto" id="clearFiltersBtn">Reset Filters</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Budget Setting Modal -->
+<div class="modal fade" id="budgetSettingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Budget Setting</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-text mb-3">Set a monthly budget for each expense category. Budget status shows up on the Total tab.</div>
+        <ul class="mw-legend" id="budgetSettingList"></ul>
+      </div>
+      <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
       </div>
     </div>

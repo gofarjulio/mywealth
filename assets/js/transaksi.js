@@ -256,6 +256,91 @@
     document.getElementById('totIncomeVal').textContent = Fmt.formatRupiah(t.income);
     document.getElementById('totExpenseVal').textContent = Fmt.formatRupiah(t.expense);
     document.getElementById('totBalanceVal').textContent = Fmt.formatRupiah(t.balance);
+    renderBudget(t.expense);
+  }
+
+  // ---------------- Budget ----------------
+  function budgetRowHTML(opts) {
+    var pct = opts.budget > 0 ? (opts.spent / opts.budget * 100) : 0;
+    var over = opts.spent > opts.budget;
+    var barPct = Math.min(pct, 100);
+    var remaining = opts.budget - opts.spent;
+    var remainingHTML = over
+      ? '<span class="budget-remaining excess">Excess ' + Fmt.formatRupiah(remaining) + '</span>'
+      : '<span class="budget-remaining">' + Fmt.formatRupiah(remaining) + '</span>';
+    return '<div class="budget-row' + (opts.isTotal ? ' budget-row-total' : '') + '">' +
+      '<div class="budget-row-top">' +
+      '<div class="budget-row-label">' + (opts.icon ? '<i class="bi ' + opts.icon + '"></i>' : '') + Fmt.escapeHTML(opts.label) + '</div>' +
+      '<div class="budget-row-amount">' + Fmt.formatRupiah(opts.budget) + '</div>' +
+      '</div>' +
+      '<div class="budget-bar-wrap">' +
+      '<div class="budget-bar"><div class="budget-bar-fill' + (over ? ' over' : '') + '" style="width:' + barPct + '%"></div></div>' +
+      '<div class="budget-pct">' + Math.round(pct) + '%</div>' +
+      '</div>' +
+      '<div class="budget-row-bottom">' +
+      '<span class="budget-spent ' + (over ? 'down' : 'up') + '">' + Fmt.formatRupiah(opts.spent) + '</span>' +
+      remainingHTML +
+      '</div></div>';
+  }
+
+  function renderBudget(totalExpense) {
+    var expenseTx = Store.getTransactions(currentFilters()).filter(function (t) { return t.type === 'expense'; });
+    var spentByCategory = {};
+    expenseTx.forEach(function (t) {
+      if (!t.category) return;
+      spentByCategory[t.category] = (spentByCategory[t.category] || 0) + t.amount;
+    });
+
+    var totalBudget = 0;
+    var rows = Store.getCategories('expense').filter(function (c) {
+      return Store.getBudget(c.id) > 0;
+    }).map(function (c) {
+      var budget = Store.getBudget(c.id);
+      totalBudget += budget;
+      return budgetRowHTML({ label: c.name, icon: c.icon, budget: budget, spent: spentByCategory[c.id] || 0 });
+    });
+
+    var host = document.getElementById('budgetList');
+    var empty = document.getElementById('budgetEmpty');
+    if (!rows.length) {
+      host.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    var totalRow = budgetRowHTML({ label: 'Total Budget', budget: totalBudget, spent: totalExpense, isTotal: true });
+    host.innerHTML = totalRow + rows.join('');
+  }
+
+  function renderBudgetSetting() {
+    var cats = Store.getCategories('expense');
+    var host = document.getElementById('budgetSettingList');
+    if (!cats.length) {
+      host.innerHTML = '<li class="text-muted-mw">No expense categories yet.</li>';
+      return;
+    }
+    host.innerHTML = cats.map(function (c) {
+      var amount = Store.getBudget(c.id);
+      return '<li><span class="legend-left"><span class="cat-icon-circle" style="width:26px;height:26px;font-size:11px;background:var(--series-' + c.colorSlot + ')"><i class="bi ' + c.icon + '"></i></span>' + Fmt.escapeHTML(c.name) + '</span>' +
+        '<span class="d-flex align-items-center gap-2">' +
+        '<span class="text-secondary-mw" style="font-size:13px;">' + Fmt.formatRupiah(amount) + '</span>' +
+        '<button class="btn btn-sm" data-cat-id="' + c.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-pencil"></i></button>' +
+        '</span></li>';
+    }).join('');
+    host.querySelectorAll('button[data-cat-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var catId = btn.getAttribute('data-cat-id');
+        var current = Store.getBudget(catId);
+        var input = prompt('Monthly budget amount (Rp):', current || '0');
+        if (input === null) return;
+        var amount = Number(input.replace(/\D/g, '')) || 0;
+        try {
+          await Store.setBudget(catId, amount);
+        } catch (err) {
+          alert('Failed to save budget: ' + (err.message || err));
+        }
+      });
+    });
   }
 
   // ---------------- Calendar tab ----------------
@@ -458,7 +543,13 @@
         alert('Failed to save note: ' + (err.message || err));
       }
     });
+
+    document.getElementById('budgetSettingModal').addEventListener('show.bs.modal', renderBudgetSetting);
   });
 
-  window.addEventListener('mw:data-changed', function () { populateFilterOptions(); renderActiveTab(); });
+  window.addEventListener('mw:data-changed', function () {
+    populateFilterOptions();
+    renderActiveTab();
+    renderBudgetSetting();
+  });
 })();

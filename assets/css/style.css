@@ -389,6 +389,29 @@ a { text-decoration: none; }
 .tx-month-expense-col .amount-text { font-size: 14px; }
 .tx-month-net { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
 
+/* ---------------- Budget progress rows ---------------- */
+.budget-row { padding: 14px 4px; border-bottom: 1px solid var(--gridline); }
+.budget-row:last-child { border-bottom: none; }
+.budget-row-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.budget-row-label {
+  display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.budget-row-label i { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+.budget-row-amount { font-size: 13px; color: var(--text-muted); flex-shrink: 0; white-space: nowrap; }
+.budget-row-total .budget-row-label { font-weight: 700; font-size: 15px; }
+.budget-bar-wrap { display: flex; align-items: center; gap: 10px; }
+.budget-bar { flex: 1; height: 8px; border-radius: 999px; background: var(--gridline); overflow: hidden; }
+.budget-bar-fill { height: 100%; border-radius: 999px; background: var(--series-1); }
+.budget-bar-fill.over { background: var(--status-critical); }
+.budget-pct { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); width: 38px; text-align: right; flex-shrink: 0; }
+.budget-row-bottom { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12.5px; }
+.budget-spent { font-weight: 600; }
+.budget-spent.up { color: var(--series-1); }
+.budget-spent.down { color: var(--status-critical); }
+.budget-remaining { color: var(--text-secondary); }
+.budget-remaining.excess { color: var(--status-critical); }
+
 /* ---------------- Legend ---------------- */
 .mw-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .mw-legend li { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; }

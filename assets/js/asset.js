@@ -90,7 +90,8 @@
   // ---------------- Progress tab ----------------
   function renderProgress() {
     var data = computeMonthlyData();
-    var target = Store.getSettings().netWorthTarget || 0;
+    var anchor = Store.currentCycleAnchor();
+    var target = Store.getTargetForCycle(anchor.year, anchor.month);
     var latest = data.length ? data[data.length - 1] : null;
     var netWorthNow = latest ? latest.netWorth : 0;
     var pct = target > 0 ? Math.round(netWorthNow / target * 100) : 0;
@@ -191,8 +192,10 @@
 
   // ---------------- Update tab ----------------
   function renderUpdateTab() {
-    var target = Store.getSettings().netWorthTarget || 0;
+    var anchor = Store.currentCycleAnchor();
+    var target = Store.getTargetForCycle(anchor.year, anchor.month);
     document.getElementById('targetInput').value = target ? Number(target).toLocaleString('id-ID') : '';
+    document.getElementById('targetMonthLabel').textContent = 'For ' + Fmt.formatMonthYear(toISO(new Date(anchor.year, anchor.month, 1)));
     var dateInput = document.getElementById('updateDateInput');
     if (!dateInput.value) dateInput.value = Store.todayISO();
 
@@ -318,7 +321,7 @@
       });
     });
 
-    var target = Store.getSettings().netWorthTarget || 0;
+    var target = Store.getTargetForCycle(historyPeriodYear, historyPeriodMonth);
 
     function totalRowHTML(label, valueFn, opts) {
       opts = opts || {};
@@ -363,11 +366,11 @@
     bodyHost.querySelectorAll('.asset-history-target-cell').forEach(function (td) {
       td.addEventListener('click', async function () {
         if (!ensureEditUnlocked()) return;
-        var input = prompt('Edit Net Worth Target (Rp):', Number(target).toLocaleString('id-ID'));
+        var input = prompt('Edit Net Worth Target for ' + Fmt.formatMonthYear(toISO(new Date(historyPeriodYear, historyPeriodMonth, 1))) + ' (Rp):', Number(target).toLocaleString('id-ID'));
         if (input === null) return;
         var digits = input.replace(/\D/g, '');
         try {
-          await Store.setNetWorthTarget(Number(digits) || 0);
+          await Store.setTargetForCycle(historyPeriodYear, historyPeriodMonth, Number(digits) || 0);
         } catch (err) {
           alert('Failed to save target: ' + (err.message || err));
         }
@@ -424,8 +427,9 @@
 
     document.getElementById('saveTargetBtn').addEventListener('click', async function () {
       var raw = document.getElementById('targetInput').value.replace(/\D/g, '');
+      var anchor = Store.currentCycleAnchor();
       try {
-        await Store.setNetWorthTarget(Number(raw) || 0);
+        await Store.setTargetForCycle(anchor.year, anchor.month, Number(raw) || 0);
       } catch (err) {
         alert('Failed to save target: ' + (err.message || err));
       }

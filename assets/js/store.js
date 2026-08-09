@@ -83,7 +83,6 @@
         familyName: (famRes.data && famRes.data.name) || 'Family',
         activeMemberId: member.id,
         activeMemberName: member.name,
-        netWorthTarget: (famRes.data && Number(famRes.data.net_worth_target)) || 0,
         monthStartDay: (famRes.data && Number(famRes.data.month_start_day)) || 1,
         weekStartDay: (famRes.data && famRes.data.week_start_day != null) ? Number(famRes.data.week_start_day) : 1,
         editPin: (famRes.data && famRes.data.edit_pin) || ''
@@ -440,13 +439,6 @@
     notify('budget-updated');
   }
 
-  async function setNetWorthTarget(amount) {
-    var res = await sb.from('families').update({ net_worth_target: Number(amount) || 0 }).eq('id', cache.familyId);
-    if (res.error) throw res.error;
-    await fetchAll();
-    notify('target-updated');
-  }
-
   async function setEditPin(pin) {
     var res = await sb.from('families').update({ edit_pin: (pin || '').trim() || null }).eq('id', cache.familyId);
     if (res.error) throw res.error;
@@ -498,10 +490,11 @@
   async function fetchAssetData() {
     var results = await Promise.all([
       sb.from('asset_accounts').select('*').eq('family_id', cache.familyId).order('created_at'),
-      sb.from('asset_snapshots').select('*').eq('family_id', cache.familyId).order('created_at')
+      sb.from('asset_snapshots').select('*').eq('family_id', cache.familyId).order('created_at'),
+      sb.from('asset_targets').select('*').eq('family_id', cache.familyId)
     ]);
-    var accRes = results[0], snapRes = results[1];
-    var err = [accRes, snapRes].find(function (r) { return r.error; });
+    var accRes = results[0], snapRes = results[1], targetRes = results[2];
+    var err = [accRes, snapRes, targetRes].find(function (r) { return r.error; });
     if (err) throw err.error;
 
     assetCache = {
@@ -510,6 +503,9 @@
       }),
       snapshots: (snapRes.data || []).map(function (s) {
         return { id: s.id, accountId: s.asset_account_id, amount: Number(s.amount), createdBy: s.created_by, createdAt: s.created_at };
+      }),
+      targets: (targetRes.data || []).map(function (t) {
+        return { year: t.year, month: t.month, amount: Number(t.amount) };
       })
     };
     return assetCache;
@@ -517,6 +513,25 @@
 
   function getAssetAccounts() { return assetCache.accounts; }
   function getAssetSnapshots() { return assetCache.snapshots; }
+
+  // Target carries forward: a month without its own explicit target inherits
+  // the most recently set target from an earlier month (0 if none exists yet).
+  function getTargetForCycle(year, month) {
+    var candidates = assetCache.targets.filter(function (t) {
+      return t.year < year || (t.year === year && t.month <= month);
+    });
+    if (!candidates.length) return 0;
+    candidates.sort(function (a, b) { return (a.year - b.year) || (a.month - b.month); });
+    return candidates[candidates.length - 1].amount;
+  }
+
+  async function setTargetForCycle(year, month, amount) {
+    var payload = { family_id: cache.familyId, year: year, month: month, amount: Number(amount) || 0 };
+    var res = await sb.from('asset_targets').upsert(payload, { onConflict: 'family_id,year,month' });
+    if (res.error) throw res.error;
+    await fetchAssetData();
+    notify('asset-target-updated');
+  }
 
   async function addAssetAccount(name, category) {
     var res = await sb.from('asset_accounts').insert({ family_id: cache.familyId, name: name, category: category });
@@ -580,10 +595,10 @@
     periodRange: periodRange, previousPeriodRange: previousPeriodRange, totals: totals, categoryBreakdown: categoryBreakdown, monthlyTrend: monthlyTrend,
     getNotes: getNotes, addNote: addNote, deleteNote: deleteNote,
     getBudgets: getBudgets, getBudget: getBudget, setBudget: setBudget,
-    setNetWorthTarget: setNetWorthTarget,
     setPeriodSettings: setPeriodSettings, monthCycleRange: monthCycleRange, currentCycleAnchor: currentCycleAnchor,
     setEditPin: setEditPin,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
+    getTargetForCycle: getTargetForCycle, setTargetForCycle: setTargetForCycle,
     addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, updateAssetSnapshot: updateAssetSnapshot, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO
   };

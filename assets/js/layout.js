@@ -419,11 +419,40 @@
     }, IDLE_TIMEOUT_MS - IDLE_WARNING_MS);
   }
 
+  // Screen-off / backgrounded tabs get their setTimeout throttled or fully
+  // suspended by the browser, so the timer above can't be trusted alone.
+  // Instead, stamp a wake-up time on visibilitychange and, once the tab is
+  // visible again (or on a fresh load after the OS discarded it), compare
+  // against wall-clock time to decide whether the idle window already
+  // elapsed while the screen was off.
+  var HIDDEN_AT_KEY = 'mw_hidden_at';
+
+  function checkHiddenElapsed() {
+    var hiddenAt = Number(localStorage.getItem(HIDDEN_AT_KEY) || 0);
+    localStorage.removeItem(HIDDEN_AT_KEY);
+    if (hiddenAt && (Date.now() - hiddenAt) >= IDLE_TIMEOUT_MS) {
+      global.MW.Store.logout();
+      return true;
+    }
+    return false;
+  }
+
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      localStorage.setItem(HIDDEN_AT_KEY, String(Date.now()));
+      if (idleTimer) clearTimeout(idleTimer);
+      hideIdleWarning();
+    } else if (!checkHiddenElapsed()) {
+      resetIdleTimer();
+    }
+  }
+
   function initIdleLogout() {
     ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function (evt) {
       document.addEventListener(evt, resetIdleTimer, { passive: true });
     });
-    resetIdleTimer();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    if (!checkHiddenElapsed()) resetIdleTimer();
   }
 
   global.MW = global.MW || {};

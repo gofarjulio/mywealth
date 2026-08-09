@@ -297,7 +297,7 @@
     var rowsAccounts = Store.getAssetAccounts().filter(function (a) { return !!byAccountDate[a.id]; });
 
     headHost.innerHTML = '<th>Account</th><th>Category</th>' + dates.map(function (d) {
-      return '<th class="text-end">' + Fmt.dayOfMonth(d) + ' ' + Fmt.formatMonthAbbr(d) + '</th>';
+      return '<th class="text-end asset-history-date-header" data-date="' + d + '" title="Click to edit date">' + Fmt.dayOfMonth(d) + ' ' + Fmt.formatMonthAbbr(d) + '</th>';
     }).join('');
 
     bodyHost.innerHTML = rowsAccounts.map(function (a) {
@@ -342,6 +342,21 @@
       totalRowHTML('Grand Total', function (d) { return investmentTotals[d] + cashTotals[d]; }) +
       targetRowHTML +
       totalRowHTML('Percentage', function (d) { return target > 0 ? (investmentTotals[d] / target * 100) : 0; }, { pct: true });
+
+    headHost.querySelectorAll('.asset-history-date-header').forEach(function (th) {
+      th.addEventListener('click', async function () {
+        if (!ensureEditUnlocked()) return;
+        var oldDate = th.getAttribute('data-date');
+        var input = prompt('Edit update date (YYYY-MM-DD). This moves every account\'s entry on this date:', oldDate);
+        if (input === null) return;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) { alert('Invalid date. Use YYYY-MM-DD.'); return; }
+        try {
+          await Store.updateSnapshotDate(oldDate, input);
+        } catch (err) {
+          alert('Failed to update date: ' + (err.message || err));
+        }
+      });
+    });
 
     bodyHost.querySelectorAll('.asset-history-cell').forEach(function (td) {
       td.addEventListener('click', async function () {

@@ -583,6 +583,19 @@
     notify('asset-snapshot-deleted');
   }
 
+  // Moves every snapshot dated oldDateISO to newDateISO, keeping each row's
+  // own time-of-day (History groups/edits by calendar date, not exact time).
+  async function updateSnapshotDate(oldDateISO, newDateISO) {
+    var matching = assetCache.snapshots.filter(function (s) { return s.createdAt.slice(0, 10) === oldDateISO; });
+    var results = await Promise.all(matching.map(function (s) {
+      return sb.from('asset_snapshots').update({ created_at: newDateISO + 'T' + s.createdAt.slice(11) }).eq('id', s.id);
+    }));
+    var err = results.find(function (r) { return r.error; });
+    if (err) throw err.error;
+    await fetchAssetData();
+    notify('asset-snapshot-date-updated');
+  }
+
   global.MW = global.MW || {};
   global.MW.Store = {
     init: init, getState: getState, logout: logout,
@@ -599,7 +612,7 @@
     setEditPin: setEditPin,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
     getTargetForCycle: getTargetForCycle, setTargetForCycle: setTargetForCycle,
-    addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, updateAssetSnapshot: updateAssetSnapshot, deleteAssetSnapshot: deleteAssetSnapshot,
+    addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, updateAssetSnapshot: updateAssetSnapshot, updateSnapshotDate: updateSnapshotDate, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO
   };
 })(window);

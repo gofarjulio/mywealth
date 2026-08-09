@@ -61,6 +61,7 @@
       var toAcc = t.to_account_id ? Store.getAccount(t.to_account_id) : null;
       var accountLabel = toAcc ? (acc ? acc.name : '-') + ' <i class="bi bi-arrow-right mx-1 text-muted-mw"></i> ' + toAcc.name : (acc ? acc.name : '-');
       var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer Antar Akun' : 'Penyesuaian Saldo');
+      var author = Store.findMember(t.created_by);
       var sign = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : (t.amount < 0 ? '-' : '+'));
       var cls = t.type === 'income' ? 'up' : (t.type === 'expense' ? 'down' : 'neutral');
       return '<tr>' +
@@ -69,6 +70,7 @@
         '<td>' + Fmt.escapeHTML(catLabel) + '</td>' +
         '<td class="text-secondary-mw">' + accountLabel + '</td>' +
         '<td class="text-muted-mw">' + Fmt.escapeHTML(t.note || '-') + '</td>' +
+        '<td class="text-secondary-mw">' + (author ? Fmt.escapeHTML(author.name) : '-') + '</td>' +
         '<td class="text-end amount-text ' + cls + '" style="white-space:nowrap;">' + sign + Fmt.formatRupiah(Math.abs(t.amount)) + '</td>' +
         '<td><div class="row-actions">' +
         '<button data-action="edit" data-id="' + t.id + '" title="Edit"><i class="bi bi-pencil"></i></button>' +

@@ -31,7 +31,7 @@
       id: row.id, date: row.tx_date, time: (row.tx_time || '00:00').slice(0, 5),
       type: row.type, amount: Number(row.amount), category: row.category_id,
       account_id: row.account_id, to_account_id: row.to_account_id || undefined,
-      note: row.note || ''
+      note: row.note || '', created_by: row.created_by || null
     };
   }
 
@@ -178,6 +178,10 @@
   function findCategory(id) {
     if (!id) return null;
     return cache.categories.expense.concat(cache.categories.income).find(function (c) { return c.id === id; }) || null;
+  }
+  function findMember(id) {
+    if (!id) return null;
+    return cache.members.find(function (m) { return m.id === id; }) || null;
   }
 
   // ---------- Accounts ----------
@@ -398,7 +402,7 @@
   global.MW.Store = {
     init: init, getState: getState, logout: logout,
     getSettings: getSettings, updateSettings: updateSettings,
-    getMembers: getMembers, addMember: addMember, updateMember: updateMember, deleteMember: deleteMember,
+    getMembers: getMembers, addMember: addMember, updateMember: updateMember, deleteMember: deleteMember, findMember: findMember,
     getCategories: getCategories, addCategory: addCategory, updateCategory: updateCategory, deleteCategory: deleteCategory, findCategory: findCategory,
     getAccounts: getAccounts, getAccount: getAccount, addAccount: addAccount, updateAccount: updateAccount, deleteAccount: deleteAccount, adjustBalance: adjustBalance,
     getTransactions: getTransactions, getTransaction: getTransaction, addTransaction: addTransaction, updateTransaction: updateTransaction, deleteTransaction: deleteTransaction, recentTransactions: recentTransactions,

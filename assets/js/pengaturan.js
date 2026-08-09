@@ -50,8 +50,29 @@
       return '<li><span class="legend-left"><span class="avatar-circle" style="width:26px;height:26px;font-size:10px;">' + m.initials + '</span>' +
         Fmt.escapeHTML(m.name) + ' <span class="text-muted-mw" style="font-size:12px;">(' + m.role + ')</span>' +
         (m.id === activeId ? ' <span class="type-badge income" style="margin-left:6px;">Aktif</span>' : '') + '</span>' +
-        '<button class="btn btn-sm" data-id="' + m.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-trash3"></i></button></li>';
+        '<span>' +
+        '<button class="btn btn-sm" data-edit-id="' + m.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-pencil"></i></button>' +
+        '<button class="btn btn-sm" data-id="' + m.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-trash3"></i></button>' +
+        '</span></li>';
     }).join('');
+    host.querySelectorAll('button[data-edit-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        var m = members.find(function (x) { return x.id === btn.getAttribute('data-edit-id'); });
+        if (!m) return;
+        var newName = prompt('Nama anggota:', m.name);
+        if (newName === null) return;
+        newName = newName.trim();
+        if (!newName) return;
+        var newRole = prompt('Peran (mis. Suami/Istri/Anak):', m.role);
+        if (newRole === null) return;
+        newRole = newRole.trim() || m.role;
+        try {
+          await Store.updateMember(m.id, { name: newName, role: newRole });
+        } catch (err) {
+          alert('Gagal mengubah anggota: ' + (err.message || err));
+        }
+      });
+    });
     host.querySelectorAll('button[data-id]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
         if (!confirm('Hapus anggota ini?')) return;

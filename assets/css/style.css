@@ -587,3 +587,46 @@ a { text-decoration: none; }
 
 .offcanvas.sidebar-offcanvas { width: 264px; background: var(--surface-1); color: var(--text-primary); }
 .offcanvas.sidebar-offcanvas .sidebar { display: block; position: static; height: auto; border: none; padding: 10px 14px; }
+
+/* ---------------- Phone: denser type + tighter spacing ---------------- */
+@media (max-width: 575.98px) {
+  body { font-size: 13.5px; }
+  .main-content { padding: 12px; }
+
+  .mw-card { padding: 13px; }
+  .mw-card-header { margin-bottom: 10px; }
+  .mw-card-header h2, .mw-card-header h3 { font-size: 14.5px; }
+  .mw-card-header .subtitle { font-size: 11.5px; }
+
+  .form-label { font-size: 12px; margin-bottom: 4px; }
+  .form-control, .form-select {
+    font-size: 13.5px;
+    padding: 6px 10px;
+  }
+  .form-control-sm, .form-select-sm {
+    font-size: 12.5px;
+    padding: 4px 8px;
+  }
+  .form-text { font-size: 11px; }
+
+  .modal-body { padding: 12px; }
+  .modal-header, .modal-footer { padding: 10px 14px; }
+
+  .mw-table { font-size: 12.5px; }
+  .mw-table thead th { padding: 6px 8px; font-size: 10px; }
+  .mw-table tbody td { padding: 9px 8px; }
+
+  .tx-row { padding: 8px 4px; gap: 8px; }
+  .tx-day-head { padding: 9px 4px 7px; }
+  .tx-day + .tx-day { margin-top: 16px; }
+  .tx-row-note { font-size: 13px; }
+
+  .tx-month-row, .budget-row { padding: 10px 4px; }
+
+  .mw-legend li { font-size: 12.5px; }
+  .mw-legend { gap: 8px; }
+
+  .stat-tile .stat-value { font-size: 21px; }
+
+  .row.g-3 { --bs-gutter-x: 0.75rem; --bs-gutter-y: 0.75rem; }
+}

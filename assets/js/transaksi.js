@@ -118,6 +118,41 @@
     return { income: income, expense: expense, balance: income - expense };
   }
 
+  function typeLabel(type) {
+    return { income: 'Income', expense: 'Expense', transfer: 'Transfer', adjustment: 'Adjustment' }[type] || type;
+  }
+
+  function exportExcel() {
+    var list = Store.getTransactions(currentFilters());
+    if (!list.length) {
+      alert('No transactions to export for the current filters.');
+      return;
+    }
+    var rows = list.map(function (t) {
+      var cat = Store.findCategory(t.category);
+      var acc = Store.getAccount(t.account_id);
+      var toAcc = t.to_account_id ? Store.getAccount(t.to_account_id) : null;
+      var author = Store.findMember(t.created_by);
+      var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer Between Accounts' : 'Balance Adjustment');
+      return {
+        Date: t.date,
+        Time: t.time || '',
+        Type: typeLabel(t.type),
+        Category: catLabel,
+        Account: acc ? acc.name : '',
+        'To Account': toAcc ? toAcc.name : '',
+        Note: t.note || '',
+        'Recorded By': author ? author.name : '',
+        Amount: t.amount
+      };
+    });
+    var ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 11 }, { wch: 7 }, { wch: 11 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 28 }, { wch: 14 }, { wch: 14 }];
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+    XLSX.writeFile(wb, 'mywealth-transactions-' + Store.todayISO() + '.xlsx');
+  }
+
   function renderDaily() {
     var list = Store.getTransactions(currentFilters());
     var host = document.getElementById('txList');
@@ -346,6 +381,7 @@
       document.getElementById(id).addEventListener('change', renderActiveTab);
     });
     document.getElementById('filterSearch').addEventListener('input', Fmt.debounce(renderActiveTab, 200));
+    document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
     document.getElementById('clearFiltersBtn').addEventListener('click', function () {
       document.getElementById('filterType').value = 'all';
       document.getElementById('filterCategory').value = '';

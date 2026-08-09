@@ -281,7 +281,7 @@
 
     var rowsAccounts = Store.getAssetAccounts().filter(function (a) { return !!byAccountDate[a.id]; });
 
-    headHost.innerHTML = '<th>Account</th>' + dates.map(function (d) {
+    headHost.innerHTML = '<th>Account</th><th>Category</th>' + dates.map(function (d) {
       return '<th class="text-end">' + Fmt.dayOfMonth(d) + ' ' + Fmt.formatMonthAbbr(d) + '</th>';
     }).join('');
 
@@ -291,8 +291,37 @@
         if (!snap) return '<td class="text-end text-muted-mw">-</td>';
         return '<td class="text-end asset-history-cell" data-snap-id="' + snap.id + '" title="Click to delete">' + Fmt.formatRupiah(snap.amount) + '</td>';
       }).join('');
-      return '<tr><td class="text-secondary-mw">' + Fmt.escapeHTML(a.name) + '</td>' + cells + '</tr>';
+      return '<tr><td class="text-secondary-mw">' + Fmt.escapeHTML(a.name) + '</td>' +
+        '<td class="text-secondary-mw">' + (CATEGORY_LABELS[a.category] || a.category) + '</td>' + cells + '</tr>';
     }).join('');
+
+    var investmentTotals = {}, cashTotals = {};
+    dates.forEach(function (d) { investmentTotals[d] = 0; cashTotals[d] = 0; });
+    rowsAccounts.forEach(function (a) {
+      dates.forEach(function (d) {
+        var snap = byAccountDate[a.id][d];
+        if (!snap) return;
+        if (a.category === 'investment') investmentTotals[d] += snap.amount;
+        else if (a.category === 'cash') cashTotals[d] += snap.amount;
+      });
+    });
+
+    var target = Store.getSettings().netWorthTarget || 0;
+
+    function totalRowHTML(label, valueFn, opts) {
+      opts = opts || {};
+      var cells = dates.map(function (d) {
+        var v = valueFn(d);
+        return '<td class="text-end">' + (opts.pct ? v.toFixed(1) + '%' : Fmt.formatRupiah(v)) + '</td>';
+      }).join('');
+      return '<tr style="font-weight:700;"><td colspan="2" class="text-secondary-mw">' + label + '</td>' + cells + '</tr>';
+    }
+
+    bodyHost.innerHTML += totalRowHTML('Investment Total', function (d) { return investmentTotals[d]; }) +
+      totalRowHTML('Cash & Equivalents Total', function (d) { return cashTotals[d]; }) +
+      totalRowHTML('Grand Total', function (d) { return investmentTotals[d] + cashTotals[d]; }) +
+      totalRowHTML('Target', function () { return target; }) +
+      totalRowHTML('Percentage', function (d) { return target > 0 ? (investmentTotals[d] / target * 100) : 0; }, { pct: true });
 
     bodyHost.querySelectorAll('.asset-history-cell').forEach(function (td) {
       td.addEventListener('click', async function () {

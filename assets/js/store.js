@@ -457,22 +457,31 @@
     notify('period-settings-updated');
   }
 
-  // A "month" for Transaksi/Asset runs from monthStartDay of (year, month) to
-  // (monthStartDay - 1) of the next month, so prev/next still steps cleanly
-  // by one cycle regardless of the configured start day.
+  // A "month" for Transaksi/Asset runs from monthStartDay to (monthStartDay - 1)
+  // of the next calendar month. If monthStartDay is past the 15th, that range
+  // is named after the month it mostly falls in (the *next* one) instead of
+  // the month it starts in — e.g. start day 25 means "25 Jul - 24 Aug" is
+  // called August, not July.
+  function cycleLabelShift() {
+    var d = cache.settings.monthStartDay || 1;
+    return d > 15 ? 1 : 0;
+  }
+
   function monthCycleRange(year, month) {
     var d = cache.settings.monthStartDay || 1;
-    var start = new Date(year, month, d);
-    var end = new Date(year, month + 1, d - 1);
+    var shift = cycleLabelShift();
+    var start = new Date(year, month - shift, d);
+    var end = new Date(year, month - shift + 1, d - 1);
     return { start: toISO(start), end: toISO(end) };
   }
 
   function currentCycleAnchor() {
     var now = new Date();
     var d = cache.settings.monthStartDay || 1;
-    if (now.getDate() >= d) return { year: now.getFullYear(), month: now.getMonth() };
-    var prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return { year: prev.getFullYear(), month: prev.getMonth() };
+    var shift = cycleLabelShift();
+    var anchor = (now.getDate() >= d) ? new Date(now.getFullYear(), now.getMonth(), 1) : new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    var nominal = new Date(anchor.getFullYear(), anchor.getMonth() + shift, 1);
+    return { year: nominal.getFullYear(), month: nominal.getMonth() };
   }
 
   // ---------- Asset tracker (standalone, own cache — not part of fetchAll) ----------

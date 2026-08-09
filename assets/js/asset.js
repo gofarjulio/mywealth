@@ -66,7 +66,7 @@
       var totalAssets = byCategory.cash + byCategory.investment + byCategory.fixed;
       var totalDebt = byCategory.debt_short + byCategory.debt_long;
       return {
-        label: Fmt.formatMonthAbbr(range.start) + ' ' + m.year,
+        label: Fmt.formatMonthAbbr(toISO(new Date(m.year, m.month, 1))) + ' ' + m.year,
         byCategory: byCategory,
         totalAssets: totalAssets,
         totalDebt: totalDebt,

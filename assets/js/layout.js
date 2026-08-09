@@ -219,12 +219,12 @@
       '<div class="col-7"><label class="form-label">Tanggal</label><input type="date" class="form-control" id="txDate" required></div>' +
       '<div class="col-5"><label class="form-label">Waktu</label><input type="time" class="form-control" id="txTime"></div>' +
       '</div>' +
-      '<div id="accountFieldWrap"><label class="form-label" id="accountLabel">Akun</label><select class="form-select" id="txAccount"></select></div>' +
-      '<div id="toAccountFieldWrap" class="d-none"><label class="form-label">Ke Akun</label><select class="form-select" id="txToAccount"></select></div>' +
-      '<div id="categoryFieldWrap"><label class="form-label">Kategori</label><select class="form-select" id="txCategory"></select></div>' +
       '<div><label class="form-label">Jumlah</label>' +
       '<div class="rp-input-group"><span class="rp-prefix">Rp</span><input type="text" inputmode="numeric" class="form-control" id="txAmount" placeholder="0" required></div>' +
       '</div>' +
+      '<div id="accountFieldWrap"><label class="form-label" id="accountLabel">Akun</label><select class="form-select" id="txAccount"></select></div>' +
+      '<div id="toAccountFieldWrap" class="d-none"><label class="form-label">Ke Akun</label><select class="form-select" id="txToAccount"></select></div>' +
+      '<div id="categoryFieldWrap"><label class="form-label">Kategori</label><select class="form-select" id="txCategory"></select></div>' +
       '<div><label class="form-label">Catatan (opsional)</label><textarea class="form-control" id="txNote" rows="2" placeholder="Deskripsi singkat..."></textarea></div>' +
       '</div>' +
       '<div class="modal-footer">' +

@@ -8,6 +8,18 @@
   var breakdownChart = null;
   var historyPeriodYear = new Date().getFullYear();
   var historyPeriodMonth = new Date().getMonth();
+  var editUnlocked = false;
+
+  function ensureEditUnlocked() {
+    var pin = Store.getSettings().editPin;
+    if (!pin) return true;
+    if (editUnlocked) return true;
+    var entered = prompt('Enter Edit PIN to modify History data:');
+    if (entered === null) return false;
+    if (entered !== pin) { alert('Incorrect PIN.'); return false; }
+    editUnlocked = true;
+    return true;
+  }
 
   var CATEGORY_LABELS = {
     cash: 'Cash & Equivalents',
@@ -289,7 +301,7 @@
       var cells = dates.map(function (d) {
         var snap = byAccountDate[a.id][d];
         if (!snap) return '<td class="text-end text-muted-mw">-</td>';
-        return '<td class="text-end asset-history-cell" data-snap-id="' + snap.id + '" title="Click to delete">' + Fmt.formatRupiah(snap.amount) + '</td>';
+        return '<td class="text-end asset-history-cell" data-snap-id="' + snap.id + '" data-amount="' + snap.amount + '" title="Click to edit">' + Fmt.formatRupiah(snap.amount) + '</td>';
       }).join('');
       return '<tr><td class="text-secondary-mw">' + Fmt.escapeHTML(a.name) + '</td>' +
         '<td class="text-secondary-mw">' + (CATEGORY_LABELS[a.category] || a.category) + '</td>' + cells + '</tr>';
@@ -317,19 +329,47 @@
       return '<tr style="font-weight:700;"><td colspan="2" class="text-secondary-mw">' + label + '</td>' + cells + '</tr>';
     }
 
+    var targetRowHTML = '<tr style="font-weight:700;"><td colspan="2" class="text-secondary-mw">Target</td>' +
+      dates.map(function () {
+        return '<td class="text-end asset-history-target-cell" title="Click to edit">' + Fmt.formatRupiah(target) + '</td>';
+      }).join('') + '</tr>';
+
     bodyHost.innerHTML += totalRowHTML('Investment Total', function (d) { return investmentTotals[d]; }) +
       totalRowHTML('Cash & Equivalents Total', function (d) { return cashTotals[d]; }) +
       totalRowHTML('Grand Total', function (d) { return investmentTotals[d] + cashTotals[d]; }) +
-      totalRowHTML('Target', function () { return target; }) +
+      targetRowHTML +
       totalRowHTML('Percentage', function (d) { return target > 0 ? (investmentTotals[d] / target * 100) : 0; }, { pct: true });
 
     bodyHost.querySelectorAll('.asset-history-cell').forEach(function (td) {
       td.addEventListener('click', async function () {
-        if (!confirm('Delete this entry?')) return;
+        if (!ensureEditUnlocked()) return;
+        var current = td.getAttribute('data-amount');
+        var input = prompt('Edit amount (Rp). Clear the field and press OK to delete this entry:', Number(current).toLocaleString('id-ID'));
+        if (input === null) return;
+        var digits = input.replace(/\D/g, '');
         try {
-          await Store.deleteAssetSnapshot(td.getAttribute('data-snap-id'));
+          if (digits === '') {
+            if (!confirm('Delete this entry?')) return;
+            await Store.deleteAssetSnapshot(td.getAttribute('data-snap-id'));
+          } else {
+            await Store.updateAssetSnapshot(td.getAttribute('data-snap-id'), Number(digits));
+          }
         } catch (err) {
-          alert('Failed to delete: ' + (err.message || err));
+          alert('Failed to save: ' + (err.message || err));
+        }
+      });
+    });
+
+    bodyHost.querySelectorAll('.asset-history-target-cell').forEach(function (td) {
+      td.addEventListener('click', async function () {
+        if (!ensureEditUnlocked()) return;
+        var input = prompt('Edit Net Worth Target (Rp):', Number(target).toLocaleString('id-ID'));
+        if (input === null) return;
+        var digits = input.replace(/\D/g, '');
+        try {
+          await Store.setNetWorthTarget(Number(digits) || 0);
+        } catch (err) {
+          alert('Failed to save target: ' + (err.message || err));
         }
       });
     });

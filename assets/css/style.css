@@ -545,8 +545,8 @@ a { text-decoration: none; }
 }
 .asset-del-btn:hover { color: var(--status-critical); background: var(--page-plane); }
 
-.asset-history-cell { cursor: pointer; }
-.asset-history-cell:hover { background: color-mix(in srgb, var(--status-critical) 12%, transparent); }
+.asset-history-cell, .asset-history-target-cell { cursor: pointer; }
+.asset-history-cell:hover, .asset-history-target-cell:hover { background: color-mix(in srgb, #0d6efd 12%, transparent); }
 
 .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .form-control, .form-select {

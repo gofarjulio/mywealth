@@ -107,6 +107,7 @@
 
     document.getElementById('familyNameInput').value = Store.getSettings().familyName;
     document.getElementById('darkModeSwitch').checked = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('editPinInput').value = Store.getSettings().editPin;
 
     populateMonthStartDayOptions();
     document.getElementById('monthStartDayInput').value = Store.getSettings().monthStartDay;
@@ -139,6 +140,16 @@
 
     document.getElementById('familyNameInput').addEventListener('change', async function () {
       await Store.updateSettings({ familyName: this.value.trim() || 'Family' });
+    });
+
+    document.getElementById('editPinForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      try {
+        await Store.setEditPin(document.getElementById('editPinInput').value);
+        alert(document.getElementById('editPinInput').value.trim() ? 'Edit PIN saved.' : 'Edit PIN disabled.');
+      } catch (err) {
+        alert('Failed to save Edit PIN: ' + (err.message || err));
+      }
     });
 
     document.getElementById('darkModeSwitch').addEventListener('change', function () {

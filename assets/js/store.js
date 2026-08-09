@@ -85,7 +85,8 @@
         activeMemberName: member.name,
         netWorthTarget: (famRes.data && Number(famRes.data.net_worth_target)) || 0,
         monthStartDay: (famRes.data && Number(famRes.data.month_start_day)) || 1,
-        weekStartDay: (famRes.data && famRes.data.week_start_day != null) ? Number(famRes.data.week_start_day) : 1
+        weekStartDay: (famRes.data && famRes.data.week_start_day != null) ? Number(famRes.data.week_start_day) : 1,
+        editPin: (famRes.data && famRes.data.edit_pin) || ''
       },
       members: (membersRes.data || []).map(function (m) { return { id: m.id, name: m.name, role: m.role, initials: m.initials, hasLogin: !!m.auth_user_id }; }),
       categories: {
@@ -446,6 +447,13 @@
     notify('target-updated');
   }
 
+  async function setEditPin(pin) {
+    var res = await sb.from('families').update({ edit_pin: (pin || '').trim() || null }).eq('id', cache.familyId);
+    if (res.error) throw res.error;
+    await fetchAll();
+    notify('edit-pin-updated');
+  }
+
   async function setPeriodSettings(monthStartDay, weekStartDay) {
     var payload = {
       month_start_day: Math.min(28, Math.max(1, Number(monthStartDay) || 1)),
@@ -546,6 +554,13 @@
     notify('asset-snapshot-added');
   }
 
+  async function updateAssetSnapshot(id, amount) {
+    var res = await sb.from('asset_snapshots').update({ amount: Number(amount) || 0 }).eq('id', id);
+    if (res.error) throw res.error;
+    await fetchAssetData();
+    notify('asset-snapshot-updated');
+  }
+
   async function deleteAssetSnapshot(id) {
     var res = await sb.from('asset_snapshots').delete().eq('id', id);
     if (res.error) throw res.error;
@@ -567,8 +582,9 @@
     getBudgets: getBudgets, getBudget: getBudget, setBudget: setBudget,
     setNetWorthTarget: setNetWorthTarget,
     setPeriodSettings: setPeriodSettings, monthCycleRange: monthCycleRange, currentCycleAnchor: currentCycleAnchor,
+    setEditPin: setEditPin,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
-    addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, deleteAssetSnapshot: deleteAssetSnapshot,
+    addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, updateAssetSnapshot: updateAssetSnapshot, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO
   };
 })(window);

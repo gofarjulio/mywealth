@@ -5,12 +5,21 @@
 
   var activeTab = 'daily';
   var now = new Date();
-  var calYear = now.getFullYear();
-  var calMonth = now.getMonth();
   var calSelectedDate = null;
+  var periodYear = now.getFullYear();
+  var periodMonth = now.getMonth();
 
   function pad2(n) { return n < 10 ? '0' + n : '' + n; }
   function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+  function renderPeriodNav() {
+    document.getElementById('periodLabel').textContent = Fmt.formatMonthYear(toISO(new Date(periodYear, periodMonth, 1)));
+  }
+
+  function applyPeriodToFilters() {
+    document.getElementById('filterStart').value = toISO(new Date(periodYear, periodMonth, 1));
+    document.getElementById('filterEnd').value = toISO(new Date(periodYear, periodMonth + 1, 0));
+  }
 
   function populateFilterOptions() {
     var catSelect = document.getElementById('filterCategory');
@@ -184,8 +193,8 @@
   // ---------------- Calendar tab ----------------
   function calendarFilters() {
     var f = currentFilters();
-    f.start = toISO(new Date(calYear, calMonth, 1));
-    f.end = toISO(new Date(calYear, calMonth + 1, 0));
+    f.start = toISO(new Date(periodYear, periodMonth, 1));
+    f.end = toISO(new Date(periodYear, periodMonth + 1, 0));
     return f;
   }
 
@@ -205,8 +214,6 @@
   }
 
   function renderCalendar() {
-    document.getElementById('calLabel').textContent = Fmt.formatMonthYear(toISO(new Date(calYear, calMonth, 1)));
-
     var list = Store.getTransactions(calendarFilters());
     var byDate = {};
     list.forEach(function (t) {
@@ -215,8 +222,8 @@
       else if (t.type === 'expense') byDate[t.date].expense += t.amount;
     });
 
-    var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-    var startOffset = new Date(calYear, calMonth, 1).getDay();
+    var daysInMonth = new Date(periodYear, periodMonth + 1, 0).getDate();
+    var startOffset = new Date(periodYear, periodMonth, 1).getDay();
     var todayIso = Store.todayISO();
 
     var cells = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(function (d) {
@@ -224,7 +231,7 @@
     }).join('');
     for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
     for (var day = 1; day <= daysInMonth; day++) {
-      var iso = toISO(new Date(calYear, calMonth, day));
+      var iso = toISO(new Date(periodYear, periodMonth, day));
       var sums = byDate[iso];
       var cls = 'cal-cell' + (iso === todayIso ? ' today' : '') + (iso === calSelectedDate ? ' selected' : '');
       var amtHtml = sums ? '<div class="cal-cell-amt">' +
@@ -306,10 +313,29 @@
     if (!ready) return;
     window.MW.Layout.init('transaksi', false);
     populateFilterOptions();
+    applyPeriodToFilters();
+    renderPeriodNav();
     switchTab('daily');
 
     document.querySelectorAll('.tx-tab').forEach(function (btn) {
       btn.addEventListener('click', function () { switchTab(btn.getAttribute('data-tab')); });
+    });
+
+    document.getElementById('periodPrevBtn').addEventListener('click', function () {
+      periodMonth -= 1;
+      if (periodMonth < 0) { periodMonth = 11; periodYear -= 1; }
+      calSelectedDate = null;
+      applyPeriodToFilters();
+      renderPeriodNav();
+      renderActiveTab();
+    });
+    document.getElementById('periodNextBtn').addEventListener('click', function () {
+      periodMonth += 1;
+      if (periodMonth > 11) { periodMonth = 0; periodYear += 1; }
+      calSelectedDate = null;
+      applyPeriodToFilters();
+      renderPeriodNav();
+      renderActiveTab();
     });
 
     ['filterType', 'filterCategory', 'filterAccount', 'filterStart', 'filterEnd'].forEach(function (id) {
@@ -324,19 +350,6 @@
       document.getElementById('filterEnd').value = '';
       document.getElementById('filterSearch').value = '';
       renderActiveTab();
-    });
-
-    document.getElementById('calPrevBtn').addEventListener('click', function () {
-      calMonth -= 1;
-      if (calMonth < 0) { calMonth = 11; calYear -= 1; }
-      calSelectedDate = null;
-      renderCalendar();
-    });
-    document.getElementById('calNextBtn').addEventListener('click', function () {
-      calMonth += 1;
-      if (calMonth > 11) { calMonth = 0; calYear += 1; }
-      calSelectedDate = null;
-      renderCalendar();
     });
 
     document.getElementById('noteAddBtn').addEventListener('click', async function () {

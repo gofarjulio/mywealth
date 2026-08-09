@@ -393,6 +393,10 @@ a { text-decoration: none; }
 .account-card .acc-top { display: flex; align-items: center; gap: 10px; }
 .account-card .acc-actions { display: flex; gap: 6px; margin-top: 6px; }
 
+/* ---------------- Transaksi page: period nav ---------------- */
+.tx-period-nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; }
+.tx-period-label { font-size: 15px; font-weight: 700; color: var(--text-primary); min-width: 140px; text-align: center; }
+
 /* ---------------- Transaksi page: tabs ---------------- */
 .tx-tabs {
   display: flex; gap: 4px; margin-bottom: 16px;

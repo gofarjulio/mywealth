@@ -64,11 +64,12 @@
       sb.from('accounts').select('*').eq('family_id', familyId).order('created_at'),
       sb.from('account_balances').select('*'),
       sb.from('transactions').select('*').eq('family_id', familyId).order('tx_date', { ascending: false }),
-      sb.from('families').select('*').eq('id', familyId).maybeSingle()
+      sb.from('families').select('*').eq('id', familyId).maybeSingle(),
+      sb.from('notes').select('*').eq('family_id', familyId).order('created_at', { ascending: false })
     ]);
-    var membersRes = results[0], catRes = results[1], accRes = results[2], balRes = results[3], txRes = results[4], famRes = results[5];
+    var membersRes = results[0], catRes = results[1], accRes = results[2], balRes = results[3], txRes = results[4], famRes = results[5], notesRes = results[6];
 
-    var firstError = [membersRes, catRes, accRes, balRes, txRes, famRes].find(function (r) { return r.error; });
+    var firstError = [membersRes, catRes, accRes, balRes, txRes, famRes, notesRes].find(function (r) { return r.error; });
     if (firstError) throw firstError.error;
 
     var balanceMap = {};
@@ -88,7 +89,10 @@
         income: (catRes.data || []).filter(function (c) { return c.type === 'income'; }).map(mapCategoryRow)
       },
       accounts: (accRes.data || []).map(function (a) { return mapAccountRow(a, balanceMap); }),
-      transactions: (txRes.data || []).map(mapTransactionRow)
+      transactions: (txRes.data || []).map(mapTransactionRow),
+      notes: (notesRes.data || []).map(function (n) {
+        return { id: n.id, content: n.content, createdBy: n.created_by, createdAt: n.created_at };
+      })
     };
     return cache;
   }
@@ -398,6 +402,22 @@
 
   function exportJSON() { return JSON.stringify(cache, null, 2); }
 
+  // ---------- Notes ----------
+  function getNotes() { return cache.notes; }
+  async function addNote(content) {
+    var payload = { family_id: cache.familyId, content: content, created_by: cache.memberId };
+    var res = await sb.from('notes').insert(payload);
+    if (res.error) throw res.error;
+    await fetchAll();
+    notify('note-added');
+  }
+  async function deleteNote(id) {
+    var res = await sb.from('notes').delete().eq('id', id);
+    if (res.error) throw res.error;
+    await fetchAll();
+    notify('note-deleted');
+  }
+
   global.MW = global.MW || {};
   global.MW.Store = {
     init: init, getState: getState, logout: logout,
@@ -408,6 +428,7 @@
     getTransactions: getTransactions, getTransaction: getTransaction, addTransaction: addTransaction, updateTransaction: updateTransaction, deleteTransaction: deleteTransaction, recentTransactions: recentTransactions,
     totalAssets: totalAssets, totalLiabilities: totalLiabilities, netWorth: netWorth,
     periodRange: periodRange, previousPeriodRange: previousPeriodRange, totals: totals, categoryBreakdown: categoryBreakdown, monthlyTrend: monthlyTrend,
+    getNotes: getNotes, addNote: addNote, deleteNote: deleteNote,
     exportJSON: exportJSON, todayISO: todayISO
   };
 })(window);

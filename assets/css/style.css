@@ -393,6 +393,37 @@ a { text-decoration: none; }
 .account-card .acc-top { display: flex; align-items: center; gap: 10px; }
 .account-card .acc-actions { display: flex; gap: 6px; margin-top: 6px; }
 
+/* ---------------- Transaksi page: tabs ---------------- */
+.tx-tabs {
+  display: flex; gap: 4px; margin-bottom: 16px;
+  border-bottom: 1px solid var(--gridline);
+  overflow-x: auto;
+}
+.tx-tab {
+  background: none; border: none; padding: 10px 14px 12px;
+  font-size: 14px; font-weight: 600; color: var(--text-muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap;
+}
+.tx-tab:hover { color: var(--text-secondary); }
+.tx-tab.active { color: var(--series-1); border-bottom-color: var(--series-1); }
+
+/* ---------------- Transaksi page: calendar ---------------- */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dow { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 700; padding: 6px 0; text-transform: uppercase; }
+.cal-cell {
+  min-height: 62px; border-radius: 8px; padding: 6px 4px;
+  border: 1px solid transparent; cursor: pointer;
+}
+.cal-cell:hover { background: var(--page-plane); }
+.cal-cell.empty { visibility: hidden; cursor: default; }
+.cal-cell.selected { border-color: var(--series-1); background: color-mix(in srgb, var(--series-1) 8%, transparent); }
+.cal-cell.today .cal-daynum { color: var(--series-1); }
+.cal-daynum { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.cal-cell-amt { font-size: 10px; line-height: 1.5; margin-top: 2px; }
+.cal-cell-amt .in { color: var(--delta-up); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-cell-amt .out { color: var(--delta-down); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* ---------------- Forms ---------------- */
 .type-toggle { display: flex; gap: 8px; }
 .type-toggle input { display: none; }

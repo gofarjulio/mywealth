@@ -22,7 +22,15 @@
     <header class="topnav" id="topnav"></header>
     <main class="main-content" id="pageContent">
 
-      <div class="mw-card mb-3">
+      <div class="tx-tabs" id="txTabs">
+        <button class="tx-tab active" data-tab="daily">Daily</button>
+        <button class="tx-tab" data-tab="calendar">Calendar</button>
+        <button class="tx-tab" data-tab="monthly">Monthly</button>
+        <button class="tx-tab" data-tab="total">Total</button>
+        <button class="tx-tab" data-tab="note">Note</button>
+      </div>
+
+      <div class="mw-card mb-3" id="filterPanel">
         <div class="row g-2 align-items-end">
           <div class="col-6 col-md-2">
             <label class="form-label">Tipe</label>
@@ -57,16 +65,80 @@
         </div>
       </div>
 
-      <div class="mw-card">
-        <div class="mw-card-header">
-          <div>
-            <h3>Daftar Transaksi</h3>
-            <div class="subtitle" id="txCountLabel">0 transaksi</div>
+      <div class="tx-tabpane" id="tabDaily">
+        <div class="mw-card">
+          <div class="mw-card-header">
+            <div>
+              <h3>Daftar Transaksi</h3>
+              <div class="subtitle" id="txCountLabel">0 transaksi</div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" id="clearFiltersBtn">Reset Filter</button>
           </div>
-          <button class="btn btn-sm btn-outline-secondary" id="clearFiltersBtn">Reset Filter</button>
+          <div id="txList"></div>
+          <div class="empty-state d-none" id="txEmpty"><i class="bi bi-inbox"></i>Tidak ada transaksi yang cocok dengan filter.</div>
         </div>
-        <div id="txList"></div>
-        <div class="empty-state d-none" id="txEmpty"><i class="bi bi-inbox"></i>Tidak ada transaksi yang cocok dengan filter.</div>
+      </div>
+
+      <div class="tx-tabpane d-none" id="tabCalendar">
+        <div class="mw-card">
+          <div class="mw-card-header">
+            <button class="btn btn-sm btn-outline-secondary" id="calPrevBtn"><i class="bi bi-chevron-left"></i></button>
+            <div style="font-weight:700;" id="calLabel"></div>
+            <button class="btn btn-sm btn-outline-secondary" id="calNextBtn"><i class="bi bi-chevron-right"></i></button>
+          </div>
+          <div id="calGrid" class="cal-grid"></div>
+        </div>
+        <div class="mw-card mt-3 d-none" id="calDayCard">
+          <div class="mw-card-header"><h3 id="calDayTitle"></h3></div>
+          <div id="calDayList"></div>
+        </div>
+      </div>
+
+      <div class="tx-tabpane d-none" id="tabMonthly">
+        <div class="mw-card">
+          <div class="mw-card-header"><div><h3>Ringkasan Bulanan</h3></div></div>
+          <div id="monthlyList"></div>
+          <div class="empty-state d-none" id="monthlyEmpty"><i class="bi bi-inbox"></i>Tidak ada transaksi yang cocok dengan filter.</div>
+        </div>
+      </div>
+
+      <div class="tx-tabpane d-none" id="tabTotal">
+        <div class="row g-3">
+          <div class="col-6 col-md-4">
+            <div class="mw-card stat-tile">
+              <div class="stat-top"><span class="stat-label">Total Pemasukan</span><span class="stat-icon icon-badge-income"><i class="bi bi-arrow-down-left"></i></span></div>
+              <div class="stat-value" id="totIncomeVal">Rp0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="mw-card stat-tile">
+              <div class="stat-top"><span class="stat-label">Total Pengeluaran</span><span class="stat-icon icon-badge-expense"><i class="bi bi-arrow-up-right"></i></span></div>
+              <div class="stat-value" id="totExpenseVal">Rp0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="mw-card stat-tile">
+              <div class="stat-top"><span class="stat-label">Saldo</span><span class="stat-icon icon-badge-balance"><i class="bi bi-wallet2"></i></span></div>
+              <div class="stat-value" id="totBalanceVal">Rp0</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-text mt-2">Mengikuti filter yang aktif di atas.</div>
+      </div>
+
+      <div class="tx-tabpane d-none" id="tabNote">
+        <div class="mw-card mb-3">
+          <div class="mw-card-header"><h3>Tambah Catatan</h3></div>
+          <div class="d-flex gap-2 align-items-start">
+            <textarea class="form-control" id="noteInput" rows="2" placeholder="Tulis catatan bebas..."></textarea>
+            <button class="btn btn-primary" id="noteAddBtn" style="border-radius:10px;">Simpan</button>
+          </div>
+        </div>
+        <div class="mw-card">
+          <div class="mw-card-header"><h3>Semua Catatan</h3></div>
+          <ul class="mw-legend" id="noteList"></ul>
+          <div class="empty-state d-none" id="noteEmpty"><i class="bi bi-journal-text"></i>Belum ada catatan.</div>
+        </div>
       </div>
 
     </main>

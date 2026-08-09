@@ -3,6 +3,15 @@
   var Store = window.MW.Store;
   var Fmt = window.MW.Format;
 
+  var activeTab = 'daily';
+  var now = new Date();
+  var calYear = now.getFullYear();
+  var calMonth = now.getMonth();
+  var calSelectedDate = null;
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
   function populateFilterOptions() {
     var catSelect = document.getElementById('filterCategory');
     var prevCat = catSelect.value;
@@ -31,21 +40,6 @@
     };
   }
 
-  function groupByDay(list) {
-    var groups = [];
-    var byDate = {};
-    list.forEach(function (t) {
-      if (!byDate[t.date]) {
-        byDate[t.date] = { date: t.date, items: [], income: 0, expense: 0 };
-        groups.push(byDate[t.date]);
-      }
-      byDate[t.date].items.push(t);
-      if (t.type === 'income') byDate[t.date].income += t.amount;
-      else if (t.type === 'expense') byDate[t.date].expense += t.amount;
-    });
-    return groups;
-  }
-
   function rowHTML(t) {
     var cat = Store.findCategory(t.category);
     var acc = Store.getAccount(t.account_id);
@@ -69,6 +63,30 @@
       '</div>';
   }
 
+  function wireRowClicks(host) {
+    host.querySelectorAll('.tx-row').forEach(function (row) {
+      row.addEventListener('click', function () {
+        window.MW.TransactionForm.open(row.getAttribute('data-id'));
+      });
+    });
+  }
+
+  // ---------------- Daily tab ----------------
+  function groupByDay(list) {
+    var groups = [];
+    var byDate = {};
+    list.forEach(function (t) {
+      if (!byDate[t.date]) {
+        byDate[t.date] = { date: t.date, items: [], income: 0, expense: 0 };
+        groups.push(byDate[t.date]);
+      }
+      byDate[t.date].items.push(t);
+      if (t.type === 'income') byDate[t.date].income += t.amount;
+      else if (t.type === 'expense') byDate[t.date].expense += t.amount;
+    });
+    return groups;
+  }
+
   function dayGroupHTML(g) {
     return '<div class="tx-day">' +
       '<div class="tx-day-head">' +
@@ -82,7 +100,7 @@
       '</div>';
   }
 
-  function renderTable() {
+  function renderDaily() {
     var list = Store.getTransactions(currentFilters());
     var host = document.getElementById('txList');
     var empty = document.getElementById('txEmpty');
@@ -94,14 +112,184 @@
       return;
     }
     empty.classList.add('d-none');
-
     host.innerHTML = groupByDay(list).map(dayGroupHTML).join('');
+    wireRowClicks(host);
+  }
 
-    host.querySelectorAll('.tx-row').forEach(function (row) {
-      row.addEventListener('click', function () {
-        window.MW.TransactionForm.open(row.getAttribute('data-id'));
+  // ---------------- Monthly tab ----------------
+  function groupByMonth(list) {
+    var groups = [];
+    var byMonth = {};
+    list.forEach(function (t) {
+      var key = t.date.slice(0, 7);
+      if (!byMonth[key]) {
+        byMonth[key] = { key: key, date: t.date, items: [], income: 0, expense: 0 };
+        groups.push(byMonth[key]);
+      }
+      byMonth[key].items.push(t);
+      if (t.type === 'income') byMonth[key].income += t.amount;
+      else if (t.type === 'expense') byMonth[key].expense += t.amount;
+    });
+    return groups;
+  }
+
+  function monthGroupHTML(g) {
+    return '<div class="tx-day">' +
+      '<div class="tx-day-head">' +
+      '<div class="tx-day-label" style="font-size:15px;">' + Fmt.formatMonthYear(g.date) + '</div>' +
+      '<div class="tx-day-sums">' +
+      '<span class="amount-text up">+' + Fmt.formatRupiah(g.income) + '</span>' +
+      '<span class="amount-text down">-' + Fmt.formatRupiah(g.expense) + '</span>' +
+      '</div></div>' +
+      '<div class="tx-day-items">' + g.items.map(rowHTML).join('') + '</div>' +
+      '</div>';
+  }
+
+  function renderMonthly() {
+    var list = Store.getTransactions(currentFilters());
+    var host = document.getElementById('monthlyList');
+    var empty = document.getElementById('monthlyEmpty');
+    if (!list.length) {
+      host.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    host.innerHTML = groupByMonth(list).map(monthGroupHTML).join('');
+    wireRowClicks(host);
+  }
+
+  // ---------------- Total tab ----------------
+  function renderTotal() {
+    var list = Store.getTransactions(currentFilters());
+    var income = 0, expense = 0;
+    list.forEach(function (t) {
+      if (t.type === 'income') income += t.amount;
+      else if (t.type === 'expense') expense += t.amount;
+    });
+    document.getElementById('totIncomeVal').textContent = Fmt.formatRupiah(income);
+    document.getElementById('totExpenseVal').textContent = Fmt.formatRupiah(expense);
+    document.getElementById('totBalanceVal').textContent = Fmt.formatRupiah(income - expense);
+  }
+
+  // ---------------- Calendar tab ----------------
+  function calendarFilters() {
+    var f = currentFilters();
+    f.start = toISO(new Date(calYear, calMonth, 1));
+    f.end = toISO(new Date(calYear, calMonth + 1, 0));
+    return f;
+  }
+
+  function renderCalDayDetail() {
+    var card = document.getElementById('calDayCard');
+    if (!calSelectedDate) { card.classList.add('d-none'); return; }
+    var list = Store.getTransactions(calendarFilters()).filter(function (t) { return t.date === calSelectedDate; });
+    document.getElementById('calDayTitle').textContent = Fmt.formatDateLong(calSelectedDate);
+    var listHost = document.getElementById('calDayList');
+    if (!list.length) {
+      listHost.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i>Tidak ada transaksi di tanggal ini.</div>';
+    } else {
+      listHost.innerHTML = list.map(rowHTML).join('');
+      wireRowClicks(listHost);
+    }
+    card.classList.remove('d-none');
+  }
+
+  function renderCalendar() {
+    document.getElementById('calLabel').textContent = Fmt.formatMonthYear(toISO(new Date(calYear, calMonth, 1)));
+
+    var list = Store.getTransactions(calendarFilters());
+    var byDate = {};
+    list.forEach(function (t) {
+      if (!byDate[t.date]) byDate[t.date] = { income: 0, expense: 0 };
+      if (t.type === 'income') byDate[t.date].income += t.amount;
+      else if (t.type === 'expense') byDate[t.date].expense += t.amount;
+    });
+
+    var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    var startOffset = new Date(calYear, calMonth, 1).getDay();
+    var todayIso = Store.todayISO();
+
+    var cells = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(function (d) {
+      return '<div class="cal-dow">' + d + '</div>';
+    }).join('');
+    for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
+    for (var day = 1; day <= daysInMonth; day++) {
+      var iso = toISO(new Date(calYear, calMonth, day));
+      var sums = byDate[iso];
+      var cls = 'cal-cell' + (iso === todayIso ? ' today' : '') + (iso === calSelectedDate ? ' selected' : '');
+      var amtHtml = sums ? '<div class="cal-cell-amt">' +
+        (sums.income ? '<span class="in">+' + Fmt.formatCompact(sums.income) + '</span>' : '') +
+        (sums.expense ? '<span class="out">-' + Fmt.formatCompact(sums.expense) + '</span>' : '') +
+        '</div>' : '';
+      cells += '<div class="' + cls + '" data-date="' + iso + '"><div class="cal-daynum">' + day + '</div>' + amtHtml + '</div>';
+    }
+    var grid = document.getElementById('calGrid');
+    grid.innerHTML = cells;
+    grid.querySelectorAll('.cal-cell[data-date]').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        calSelectedDate = cell.getAttribute('data-date');
+        renderCalendar();
       });
     });
+
+    renderCalDayDetail();
+  }
+
+  // ---------------- Note tab ----------------
+  function renderNotes() {
+    var notes = Store.getNotes();
+    var host = document.getElementById('noteList');
+    var empty = document.getElementById('noteEmpty');
+    if (!notes.length) {
+      host.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    host.innerHTML = notes.map(function (n) {
+      var author = Store.findMember(n.createdBy);
+      var d = new Date(n.createdAt);
+      var whenLabel = Fmt.formatDateShort(n.createdAt.slice(0, 10)) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+      return '<li style="align-items:flex-start;">' +
+        '<span class="legend-left" style="flex-direction:column;align-items:flex-start;gap:2px;">' +
+        '<span>' + Fmt.escapeHTML(n.content).replace(/\n/g, '<br>') + '</span>' +
+        '<span class="text-muted-mw" style="font-size:11px;">' + whenLabel + (author ? ' &middot; ' + Fmt.escapeHTML(author.name) : '') + '</span>' +
+        '</span>' +
+        '<button class="btn btn-sm" data-id="' + n.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-trash3"></i></button>' +
+        '</li>';
+    }).join('');
+    host.querySelectorAll('button[data-id]').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        if (!confirm('Hapus catatan ini?')) return;
+        try {
+          await Store.deleteNote(btn.getAttribute('data-id'));
+        } catch (err) {
+          alert('Gagal menghapus catatan: ' + (err.message || err));
+        }
+      });
+    });
+  }
+
+  // ---------------- Tab switching ----------------
+  function renderActiveTab() {
+    if (activeTab === 'daily') renderDaily();
+    else if (activeTab === 'calendar') renderCalendar();
+    else if (activeTab === 'monthly') renderMonthly();
+    else if (activeTab === 'total') renderTotal();
+    else if (activeTab === 'note') renderNotes();
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tx-tab').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+    });
+    ['daily', 'calendar', 'monthly', 'total', 'note'].forEach(function (t) {
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('d-none', t !== tab);
+    });
+    document.getElementById('filterPanel').classList.toggle('d-none', tab === 'note');
+    renderActiveTab();
   }
 
   document.addEventListener('DOMContentLoaded', async function () {
@@ -109,12 +297,16 @@
     if (!ready) return;
     window.MW.Layout.init('transaksi', false);
     populateFilterOptions();
-    renderTable();
+    switchTab('daily');
+
+    document.querySelectorAll('.tx-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchTab(btn.getAttribute('data-tab')); });
+    });
 
     ['filterType', 'filterCategory', 'filterAccount', 'filterStart', 'filterEnd'].forEach(function (id) {
-      document.getElementById(id).addEventListener('change', renderTable);
+      document.getElementById(id).addEventListener('change', renderActiveTab);
     });
-    document.getElementById('filterSearch').addEventListener('input', Fmt.debounce(renderTable, 200));
+    document.getElementById('filterSearch').addEventListener('input', Fmt.debounce(renderActiveTab, 200));
     document.getElementById('clearFiltersBtn').addEventListener('click', function () {
       document.getElementById('filterType').value = 'all';
       document.getElementById('filterCategory').value = '';
@@ -122,8 +314,34 @@
       document.getElementById('filterStart').value = '';
       document.getElementById('filterEnd').value = '';
       document.getElementById('filterSearch').value = '';
-      renderTable();
+      renderActiveTab();
+    });
+
+    document.getElementById('calPrevBtn').addEventListener('click', function () {
+      calMonth -= 1;
+      if (calMonth < 0) { calMonth = 11; calYear -= 1; }
+      calSelectedDate = null;
+      renderCalendar();
+    });
+    document.getElementById('calNextBtn').addEventListener('click', function () {
+      calMonth += 1;
+      if (calMonth > 11) { calMonth = 0; calYear += 1; }
+      calSelectedDate = null;
+      renderCalendar();
+    });
+
+    document.getElementById('noteAddBtn').addEventListener('click', async function () {
+      var input = document.getElementById('noteInput');
+      var val = input.value.trim();
+      if (!val) return;
+      try {
+        await Store.addNote(val);
+        input.value = '';
+      } catch (err) {
+        alert('Gagal menyimpan catatan: ' + (err.message || err));
+      }
     });
   });
-  window.addEventListener('mw:data-changed', function () { populateFilterOptions(); renderTable(); });
+
+  window.addEventListener('mw:data-changed', function () { populateFilterOptions(); renderActiveTab(); });
 })();

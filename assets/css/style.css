@@ -337,6 +337,40 @@ a { text-decoration: none; }
 }
 .row-actions button:hover { color: var(--text-primary); background: var(--page-plane); }
 
+/* ---------------- Transaction list, grouped by day ---------------- */
+.tx-day + .tx-day { margin-top: 4px; }
+.tx-day-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 4px 8px;
+  border-bottom: 1px solid var(--gridline);
+}
+.tx-day:first-child .tx-day-head { padding-top: 2px; }
+.tx-day-datebox { display: flex; flex-direction: column; align-items: center; line-height: 1.1; min-width: 32px; flex-shrink: 0; }
+.tx-day-dom { font-size: 19px; font-weight: 700; color: var(--text-primary); }
+.tx-day-dow { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+.tx-day-label { flex: 1; min-width: 0; font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+.tx-day-sums { display: flex; gap: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+
+.tx-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 4px; border-bottom: 1px solid var(--gridline);
+  cursor: pointer;
+}
+.tx-day-items .tx-row:last-child { border-bottom: none; }
+.tx-row:hover { background: var(--page-plane); }
+.tx-row-main { flex: 1; min-width: 0; }
+.tx-row-cat { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+.tx-row-sub {
+  font-size: 12px; color: var(--text-muted); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tx-row-amount { font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+.tx-row-del {
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: transparent; color: var(--text-muted);
+}
+.tx-row-del:hover { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 12%, transparent); }
+
 /* ---------------- Legend ---------------- */
 .mw-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .mw-legend li { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; }

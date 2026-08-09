@@ -36,6 +36,19 @@
     return d.getDate() + ' ' + MONTH_NAMES[d.getMonth()].slice(0, 3) + ' ' + d.getFullYear();
   }
 
+  function formatDayAbbr(iso) {
+    return DAY_NAMES[parseISODate(iso).getDay()].slice(0, 3);
+  }
+
+  function dayOfMonth(iso) {
+    return parseISODate(iso).getDate();
+  }
+
+  function formatMonthYear(iso) {
+    var d = parseISODate(iso);
+    return MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
   function debounce(fn, wait) {
     var t = null;
     return function () {
@@ -63,6 +76,9 @@
     formatCompact: formatCompact,
     formatDateLong: formatDateLong,
     formatDateShort: formatDateShort,
+    formatDayAbbr: formatDayAbbr,
+    dayOfMonth: dayOfMonth,
+    formatMonthYear: formatMonthYear,
     debounce: debounce,
     escapeHTML: escapeHTML,
     cssVar: cssVar,

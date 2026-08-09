@@ -82,12 +82,44 @@
         </div>
       </div>
 
-      <div class="mw-card">
-        <div class="mw-card-header"><div><h3>App Data</h3><div class="subtitle">Stored in the family database (Supabase), synced across all devices</div></div></div>
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-sm btn-outline-secondary" id="exportJsonBtn"><i class="bi bi-download me-1"></i>Export Backup (JSON)</button>
+      <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+          <div class="mw-card h-100">
+            <div class="mw-card-header"><div><h3>Period Settings</h3><div class="subtitle">Applies to Transactions &amp; Asset pages</div></div></div>
+            <form class="d-flex flex-column gap-3" id="periodSettingsForm">
+              <div>
+                <label class="form-label">Monthly Start Date</label>
+                <select class="form-select form-select-sm" id="monthStartDayInput" style="max-width:120px;"></select>
+                <div class="form-text">Each "month" runs from this date to the day before it next month.</div>
+              </div>
+              <div>
+                <label class="form-label">Weekly Start Day</label>
+                <select class="form-select form-select-sm" id="weekStartDayInput" style="max-width:160px;">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+                <div class="form-text">First column of the Calendar tab in Transactions.</div>
+              </div>
+              <div>
+                <button class="btn btn-sm btn-primary" type="submit">Save Period Settings</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="form-text mt-2">For new members: create a login account via the Supabase Dashboard, then link it using the <code>003_link_auth_users.sql</code> script.</div>
+        <div class="col-lg-6">
+          <div class="mw-card h-100">
+            <div class="mw-card-header"><div><h3>App Data</h3><div class="subtitle">Stored in the family database (Supabase), synced across all devices</div></div></div>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-sm btn-outline-secondary" id="exportJsonBtn"><i class="bi bi-download me-1"></i>Export Backup (JSON)</button>
+            </div>
+            <div class="form-text mt-2">For new members: create a login account via the Supabase Dashboard, then link it using the <code>003_link_auth_users.sql</code> script.</div>
+          </div>
+        </div>
       </div>
 
     </main>

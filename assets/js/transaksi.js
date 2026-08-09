@@ -19,8 +19,9 @@
   }
 
   function applyPeriodToFilters() {
-    document.getElementById('filterStart').value = toISO(new Date(periodYear, periodMonth, 1));
-    document.getElementById('filterEnd').value = toISO(new Date(periodYear, periodMonth + 1, 0));
+    var range = Store.monthCycleRange(periodYear, periodMonth);
+    document.getElementById('filterStart').value = range.start;
+    document.getElementById('filterEnd').value = range.end;
   }
 
   function populateFilterOptions() {
@@ -376,11 +377,13 @@
     });
 
     var daysInMonth = new Date(periodYear, periodMonth + 1, 0).getDate();
+    var weekStartDay = Store.getSettings().weekStartDay;
     var jsStartDay = new Date(periodYear, periodMonth, 1).getDay();
-    var startOffset = (jsStartDay + 6) % 7; // 0=Monday ... 6=Sunday
+    var startOffset = (jsStartDay - weekStartDay + 7) % 7;
     var todayIso = Store.todayISO();
 
-    var cells = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) {
+    var DOW_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var cells = DOW_LABELS.map(function (_, k) { return DOW_LABELS[(weekStartDay + k) % 7]; }).map(function (d) {
       return '<div class="cal-dow">' + d + '</div>';
     }).join('');
     for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
@@ -483,6 +486,9 @@
     var ready = await Store.init();
     if (!ready) return;
     window.MW.Layout.init('transaksi', false);
+    var anchor = Store.currentCycleAnchor();
+    periodYear = anchor.year;
+    periodMonth = anchor.month;
     populateFilterOptions();
     applyPeriodToFilters();
     renderPeriodNav();

@@ -37,15 +37,13 @@
     return snaps[snaps.length - 1].amount;
   }
 
-  function monthEndISO(year, month) { return toISO(new Date(year, month + 1, 0)); }
-
   function getMonthRange() {
     var snaps = Store.getAssetSnapshots();
     if (!snaps.length) return [];
     var earliest = new Date(snaps[0].createdAt.slice(0, 10));
     var start = new Date(earliest.getFullYear(), earliest.getMonth(), 1);
-    var now = new Date();
-    var end = new Date(now.getFullYear(), now.getMonth(), 1);
+    var anchor = Store.currentCycleAnchor();
+    var end = new Date(anchor.year, anchor.month, 1);
     var months = [];
     var cur = new Date(start);
     while (cur <= end) {
@@ -59,16 +57,16 @@
     var months = getMonthRange();
     var accounts = Store.getAssetAccounts();
     return months.map(function (m) {
-      var cutoff = monthEndISO(m.year, m.month);
+      var range = Store.monthCycleRange(m.year, m.month);
       var byCategory = { cash: 0, investment: 0, fixed: 0, debt_short: 0, debt_long: 0 };
       accounts.forEach(function (a) {
-        var v = valueAsOf(a.id, cutoff);
+        var v = valueAsOf(a.id, range.end);
         if (v != null) byCategory[a.category] += v;
       });
       var totalAssets = byCategory.cash + byCategory.investment + byCategory.fixed;
       var totalDebt = byCategory.debt_short + byCategory.debt_long;
       return {
-        label: Fmt.formatMonthAbbr(cutoff) + ' ' + m.year,
+        label: Fmt.formatMonthAbbr(range.start) + ' ' + m.year,
         byCategory: byCategory,
         totalAssets: totalAssets,
         totalDebt: totalDebt,
@@ -246,8 +244,9 @@
   }
 
   function renderHistory() {
-    var start = historyPeriodYear + '-' + pad2(historyPeriodMonth + 1) + '-01';
-    var end = toISO(new Date(historyPeriodYear, historyPeriodMonth + 1, 0));
+    var range = Store.monthCycleRange(historyPeriodYear, historyPeriodMonth);
+    var start = range.start;
+    var end = range.end;
     var snaps = Store.getAssetSnapshots().filter(function (s) {
       var d = s.createdAt.slice(0, 10);
       return d >= start && d <= end;
@@ -330,6 +329,9 @@
     if (!ready) return;
     window.MW.Layout.init('asset', false);
     await Store.fetchAssetData();
+    var anchor = Store.currentCycleAnchor();
+    historyPeriodYear = anchor.year;
+    historyPeriodMonth = anchor.month;
     formatAmountInput(document.getElementById('targetInput'));
     renderHistoryPeriodNav();
     switchTab('progress');

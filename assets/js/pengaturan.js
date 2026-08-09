@@ -92,6 +92,12 @@
     renderMembers();
   }
 
+  function populateMonthStartDayOptions() {
+    var html = '';
+    for (var d = 1; d <= 28; d++) html += '<option value="' + d + '">' + d + '</option>';
+    document.getElementById('monthStartDayInput').innerHTML = html;
+  }
+
   document.addEventListener('DOMContentLoaded', async function () {
     var ready = await Store.init();
     if (!ready) return;
@@ -101,6 +107,10 @@
 
     document.getElementById('familyNameInput').value = Store.getSettings().familyName;
     document.getElementById('darkModeSwitch').checked = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    populateMonthStartDayOptions();
+    document.getElementById('monthStartDayInput').value = Store.getSettings().monthStartDay;
+    document.getElementById('weekStartDayInput').value = Store.getSettings().weekStartDay;
 
     document.getElementById('expenseCatForm').addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -138,6 +148,18 @@
       window.dispatchEvent(new CustomEvent('mw:theme-changed', { detail: { theme: theme } }));
       var icon = document.getElementById('themeIcon');
       if (icon) icon.className = 'bi ' + (theme === 'dark' ? 'bi-sun' : 'bi-moon-stars');
+    });
+
+    document.getElementById('periodSettingsForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var monthStartDay = document.getElementById('monthStartDayInput').value;
+      var weekStartDay = document.getElementById('weekStartDayInput').value;
+      try {
+        await Store.setPeriodSettings(monthStartDay, weekStartDay);
+        alert('Period settings saved.');
+      } catch (err) {
+        alert('Failed to save period settings: ' + (err.message || err));
+      }
     });
 
     document.getElementById('exportJsonBtn').addEventListener('click', function () {

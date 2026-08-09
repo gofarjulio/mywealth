@@ -83,7 +83,9 @@
         familyName: (famRes.data && famRes.data.name) || 'Family',
         activeMemberId: member.id,
         activeMemberName: member.name,
-        netWorthTarget: (famRes.data && Number(famRes.data.net_worth_target)) || 0
+        netWorthTarget: (famRes.data && Number(famRes.data.net_worth_target)) || 0,
+        monthStartDay: (famRes.data && Number(famRes.data.month_start_day)) || 1,
+        weekStartDay: (famRes.data && famRes.data.week_start_day != null) ? Number(famRes.data.week_start_day) : 1
       },
       members: (membersRes.data || []).map(function (m) { return { id: m.id, name: m.name, role: m.role, initials: m.initials, hasLogin: !!m.auth_user_id }; }),
       categories: {
@@ -444,6 +446,35 @@
     notify('target-updated');
   }
 
+  async function setPeriodSettings(monthStartDay, weekStartDay) {
+    var payload = {
+      month_start_day: Math.min(28, Math.max(1, Number(monthStartDay) || 1)),
+      week_start_day: Math.min(6, Math.max(0, Number(weekStartDay)))
+    };
+    var res = await sb.from('families').update(payload).eq('id', cache.familyId);
+    if (res.error) throw res.error;
+    await fetchAll();
+    notify('period-settings-updated');
+  }
+
+  // A "month" for Transaksi/Asset runs from monthStartDay of (year, month) to
+  // (monthStartDay - 1) of the next month, so prev/next still steps cleanly
+  // by one cycle regardless of the configured start day.
+  function monthCycleRange(year, month) {
+    var d = cache.settings.monthStartDay || 1;
+    var start = new Date(year, month, d);
+    var end = new Date(year, month + 1, d - 1);
+    return { start: toISO(start), end: toISO(end) };
+  }
+
+  function currentCycleAnchor() {
+    var now = new Date();
+    var d = cache.settings.monthStartDay || 1;
+    if (now.getDate() >= d) return { year: now.getFullYear(), month: now.getMonth() };
+    var prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return { year: prev.getFullYear(), month: prev.getMonth() };
+  }
+
   // ---------- Asset tracker (standalone, own cache — not part of fetchAll) ----------
   var assetCache = null;
 
@@ -526,6 +557,7 @@
     getNotes: getNotes, addNote: addNote, deleteNote: deleteNote,
     getBudgets: getBudgets, getBudget: getBudget, setBudget: setBudget,
     setNetWorthTarget: setNetWorthTarget,
+    setPeriodSettings: setPeriodSettings, monthCycleRange: monthCycleRange, currentCycleAnchor: currentCycleAnchor,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
     addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO

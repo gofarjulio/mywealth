@@ -363,14 +363,58 @@
   }
 
   // -------------------- Auto-logout on inactivity --------------------
-  var IDLE_TIMEOUT_MS = 30000;
+  var IDLE_TIMEOUT_MS = 5 * 60 * 1000;
+  var IDLE_WARNING_MS = 30 * 1000;
   var idleTimer = null;
+  var countdownInterval = null;
+  var warningModalInstance = null;
+
+  function ensureIdleWarningModal() {
+    if (warningModalInstance) return;
+    var wrap = document.createElement('div');
+    wrap.innerHTML = '' +
+      '<div class="modal fade" id="idleWarningModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">' +
+      '<div class="modal-dialog modal-dialog-centered">' +
+      '<div class="modal-content">' +
+      '<div class="modal-body text-center py-4">' +
+      '<i class="bi bi-hourglass-split" style="font-size:28px;color:var(--status-warning);"></i>' +
+      '<h5 class="mt-3 mb-2">Sesi akan berakhir</h5>' +
+      '<p class="text-muted-mw mb-3">Tidak ada aktivitas. Anda akan keluar otomatis dalam <strong id="idleCountdown">30</strong> detik.</p>' +
+      '<button type="button" class="btn btn-primary" id="idleStayBtn">Tetap Masuk</button>' +
+      '</div></div></div></div>';
+    document.body.appendChild(wrap.firstElementChild);
+    warningModalInstance = new bootstrap.Modal(document.getElementById('idleWarningModal'));
+    document.getElementById('idleStayBtn').addEventListener('click', function () { resetIdleTimer(); });
+  }
+
+  function hideIdleWarning() {
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    if (warningModalInstance) warningModalInstance.hide();
+  }
+
+  function showIdleWarning() {
+    ensureIdleWarningModal();
+    var remaining = Math.round(IDLE_WARNING_MS / 1000);
+    var el = document.getElementById('idleCountdown');
+    if (el) el.textContent = remaining;
+    warningModalInstance.show();
+    countdownInterval = setInterval(function () {
+      remaining -= 1;
+      var countEl = document.getElementById('idleCountdown');
+      if (countEl) countEl.textContent = Math.max(remaining, 0);
+      if (remaining <= 0 && countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    }, 1000);
+  }
 
   function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
+    hideIdleWarning();
     idleTimer = setTimeout(function () {
-      global.MW.Store.logout();
-    }, IDLE_TIMEOUT_MS);
+      showIdleWarning();
+      idleTimer = setTimeout(function () {
+        global.MW.Store.logout();
+      }, IDLE_WARNING_MS);
+    }, IDLE_TIMEOUT_MS - IDLE_WARNING_MS);
   }
 
   function initIdleLogout() {

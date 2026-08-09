@@ -82,7 +82,7 @@
         activeMemberId: member.id,
         activeMemberName: member.name
       },
-      members: (membersRes.data || []).map(function (m) { return { id: m.id, name: m.name, role: m.role, initials: m.initials }; }),
+      members: (membersRes.data || []).map(function (m) { return { id: m.id, name: m.name, role: m.role, initials: m.initials, hasLogin: !!m.auth_user_id }; }),
       categories: {
         expense: (catRes.data || []).filter(function (c) { return c.type === 'expense'; }).map(mapCategoryRow),
         income: (catRes.data || []).filter(function (c) { return c.type === 'income'; }).map(mapCategoryRow)
@@ -138,6 +138,8 @@
   }
   async function deleteMember(id) {
     if (id === cache.memberId) return { ok: false, reason: 'self' };
+    var target = cache.members.find(function (m) { return m.id === id; });
+    if (target && target.hasLogin) return { ok: false, reason: 'linked' };
     var res = await sb.from('family_members').delete().eq('id', id);
     if (res.error) return { ok: false, reason: res.error.message };
     await fetchAll();

@@ -78,7 +78,9 @@
         if (!confirm('Hapus anggota ini?')) return;
         var res = await Store.deleteMember(btn.getAttribute('data-id'));
         if (!res.ok) {
-          alert(res.reason === 'self' ? 'Anda tidak bisa menghapus akun Anda sendiri yang sedang login.' : 'Gagal menghapus anggota.');
+          if (res.reason === 'self') alert('Anda tidak bisa menghapus akun Anda sendiri yang sedang login.');
+          else if (res.reason === 'linked') alert('Anggota ini masih punya akses login aktif. Hapus dulu user-nya lewat Supabase Authentication sebelum menghapus data anggota ini di sini.');
+          else alert('Gagal menghapus anggota.');
         }
       });
     });

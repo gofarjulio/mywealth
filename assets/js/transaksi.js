@@ -66,7 +66,6 @@
       '<div class="tx-row-sub">' + subParts.join(' &middot; ') + '</div>' +
       '</div>' +
       '<div class="tx-row-amount amount-text ' + cls + '">' + sign + Fmt.formatRupiah(Math.abs(t.amount)) + '</div>' +
-      '<button class="tx-row-del" data-action="delete" data-id="' + t.id + '" title="Hapus"><i class="bi bi-trash3"></i></button>' +
       '</div>';
   }
 
@@ -101,17 +100,6 @@
     host.querySelectorAll('.tx-row').forEach(function (row) {
       row.addEventListener('click', function () {
         window.MW.TransactionForm.open(row.getAttribute('data-id'));
-      });
-    });
-    host.querySelectorAll('[data-action="delete"]').forEach(function (btn) {
-      btn.addEventListener('click', async function (e) {
-        e.stopPropagation();
-        if (!confirm('Hapus transaksi ini? Saldo akun akan disesuaikan kembali.')) return;
-        try {
-          await Store.deleteTransaction(btn.getAttribute('data-id'));
-        } catch (err) {
-          alert('Gagal menghapus transaksi: ' + (err.message || err));
-        }
       });
     });
   }

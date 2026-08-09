@@ -365,11 +365,6 @@ a { text-decoration: none; }
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tx-row-amount { font-size: 14px; white-space: nowrap; flex-shrink: 0; }
-.tx-row-del {
-  flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; border: none;
-  background: transparent; color: var(--text-muted);
-}
-.tx-row-del:hover { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 12%, transparent); }
 
 /* ---------------- Legend ---------------- */
 .mw-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }

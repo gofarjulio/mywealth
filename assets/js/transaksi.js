@@ -100,11 +100,25 @@
       '</div>';
   }
 
+  function computeTotals(list) {
+    var income = 0, expense = 0;
+    list.forEach(function (t) {
+      if (t.type === 'income') income += t.amount;
+      else if (t.type === 'expense') expense += t.amount;
+    });
+    return { income: income, expense: expense, balance: income - expense };
+  }
+
   function renderDaily() {
     var list = Store.getTransactions(currentFilters());
     var host = document.getElementById('txList');
     var empty = document.getElementById('txEmpty');
     document.getElementById('txCountLabel').textContent = list.length + ' transaksi';
+
+    var t = computeTotals(list);
+    document.getElementById('dailyIncomeVal').textContent = Fmt.formatRupiah(t.income);
+    document.getElementById('dailyExpenseVal').textContent = Fmt.formatRupiah(t.expense);
+    document.getElementById('dailyTotalVal').textContent = Fmt.formatRupiah(t.balance);
 
     if (!list.length) {
       host.innerHTML = '';
@@ -161,15 +175,10 @@
 
   // ---------------- Total tab ----------------
   function renderTotal() {
-    var list = Store.getTransactions(currentFilters());
-    var income = 0, expense = 0;
-    list.forEach(function (t) {
-      if (t.type === 'income') income += t.amount;
-      else if (t.type === 'expense') expense += t.amount;
-    });
-    document.getElementById('totIncomeVal').textContent = Fmt.formatRupiah(income);
-    document.getElementById('totExpenseVal').textContent = Fmt.formatRupiah(expense);
-    document.getElementById('totBalanceVal').textContent = Fmt.formatRupiah(income - expense);
+    var t = computeTotals(Store.getTransactions(currentFilters()));
+    document.getElementById('totIncomeVal').textContent = Fmt.formatRupiah(t.income);
+    document.getElementById('totExpenseVal').textContent = Fmt.formatRupiah(t.expense);
+    document.getElementById('totBalanceVal').textContent = Fmt.formatRupiah(t.balance);
   }
 
   // ---------------- Calendar tab ----------------

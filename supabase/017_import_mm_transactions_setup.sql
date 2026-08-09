@@ -1,6 +1,12 @@
 ﻿-- MyWealth — import transactions from Money Manager export (Money Manager_8-9-26.xlsx)
 -- Step 1/5: accounts + new categories. Jalankan sekali di Supabase SQL Editor,
 -- SEBELUM menjalankan file transaksi per tahun (018-021).
+--
+-- Kategori yang maknanya mirip kategori default sudah digabung ke situ
+-- (Food & Beverage->Food, Transport->Transportation, Leisure->Entertainment,
+-- Internet Service & Living->Bills, Self Development->Education,
+-- Trading->Investment Income, Allowance/Reward/Voucher->Bonus).
+-- Sisanya (tidak ada padanan yang cocok) dibuat sebagai kategori baru di bawah ini.
 
 -- Akun (skip yang sudah ada, cocokkan by nama)
 with fam as (select id from families limit 1)
@@ -17,27 +23,17 @@ where not exists (
   select 1 from accounts a where a.family_id = fam.id and a.name = v.name
 );
 
--- Kategori baru (skip yang sudah ada persis namanya+tipenya, mis. Shopping/Other/Health/Salary/Bonus)
+-- Kategori baru (tidak ada padanan yang cocok di kategori default)
 with fam as (select id from families limit 1)
 insert into categories (family_id, type, name, icon, color_slot)
 select fam.id, v.type, v.name, v.icon, v.slot
 from fam, (values
-  ('expense', 'Food & Beverage',      'bi-cup-hot',          1),
-  ('expense', 'Transport',            'bi-train-front',      2),
   ('expense', 'Supermarket',          'bi-basket',           4),
   ('expense', 'Gifts & Social Life',  'bi-gift',             6),
-  ('expense', 'Living',               'bi-house-door',       3),
   ('expense', 'Top Up',               'bi-phone',            7),
   ('expense', 'Family',               'bi-people',           5),
-  ('expense', 'Leisure',              'bi-controller',       6),
-  ('expense', 'Internet Service',     'bi-wifi',             7),
   ('expense', 'House',                'bi-house',            3),
-  ('expense', 'Self Development',     'bi-mortarboard',      7),
-  ('expense', 'Investment',           'bi-graph-up-arrow',   8),
-  ('income',  'Allowance',            'bi-cash-coin',        2),
-  ('income',  'Reward',               'bi-award',            4),
-  ('income',  'Voucher',              'bi-ticket-perforated',5),
-  ('income',  'Trading',              'bi-graph-up',         6)
+  ('expense', 'Investment',           'bi-graph-up-arrow',   8)
 ) as v(type, name, icon, slot)
 where not exists (
   select 1 from categories c where c.family_id = fam.id and c.type = v.type and c.name = v.name

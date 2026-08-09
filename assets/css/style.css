@@ -525,6 +525,26 @@ a { text-decoration: none; }
 }
 .rp-input-group input { padding-left: 38px; }
 
+/* ---------------- Asset tracker: update rows ---------------- */
+.asset-cat-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); font-weight: 700;
+  padding: 14px 4px 6px;
+}
+.asset-update-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 4px; border-bottom: 1px solid var(--gridline);
+}
+.asset-update-row:last-child { border-bottom: none; }
+.asset-update-name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-weight: 600; font-size: 13.5px; color: var(--text-primary); }
+.asset-update-last { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-top: 1px; }
+.asset-update-input-wrap { width: 150px; flex-shrink: 0; }
+.asset-update-input-wrap input { padding-top: 6px; padding-bottom: 6px; font-size: 13px; }
+.asset-del-btn {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text-muted);
+}
+.asset-del-btn:hover { color: var(--status-critical); background: var(--page-plane); }
+
 .form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .form-control, .form-select {
   background: var(--surface-2); color: var(--text-primary); border-color: var(--border);

@@ -7,6 +7,7 @@
     { key: 'transaksi', href: 'transaksi.html', icon: 'bi-arrow-left-right', label: 'Transactions' },
     { key: 'akun', href: 'akun.html', icon: 'bi-wallet2', label: 'Accounts' },
     { key: 'statistik', href: 'statistik.html', icon: 'bi-bar-chart-line', label: 'Statistics' },
+    { key: 'asset', href: 'asset.html', icon: 'bi-piggy-bank', label: 'Asset' },
     { key: 'pengaturan', href: 'pengaturan.html', icon: 'bi-gear', label: 'Settings' }
   ];
 
@@ -15,6 +16,7 @@
     transaksi: 'Transactions',
     akun: 'Accounts & Assets',
     statistik: 'Statistics & Analytics',
+    asset: 'Asset',
     pengaturan: 'Settings'
   };
 

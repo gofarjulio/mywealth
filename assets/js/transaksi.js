@@ -56,17 +56,23 @@
     var accountLabel = toAcc
       ? Fmt.escapeHTML(acc ? acc.name : '-') + ' <i class="bi bi-arrow-right mx-1 text-muted-mw"></i> ' + Fmt.escapeHTML(toAcc.name)
       : Fmt.escapeHTML(acc ? acc.name : '-');
-    var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer Between Accounts' : 'Balance Adjustment');
+    var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer' : 'Adjustment');
+    var icon = cat ? cat.icon : (t.type === 'transfer' ? 'bi-arrow-left-right' : 'bi-sliders');
+    var slot = cat ? cat.colorSlot : (t.type === 'transfer' ? 1 : 8);
     var author = Store.findMember(t.created_by);
-    var subParts = [accountLabel];
-    if (t.note) subParts.push(Fmt.escapeHTML(t.note));
-    if (author) subParts.push(Fmt.escapeHTML(author.name));
+    var noteText = t.note ? Fmt.escapeHTML(t.note) : Fmt.escapeHTML(catLabel);
+    var accountParts = [accountLabel];
+    if (author) accountParts.push(Fmt.escapeHTML(author.name));
     var sign = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : (t.amount < 0 ? '-' : '+'));
     var cls = t.type === 'income' ? 'up' : (t.type === 'expense' ? 'down' : 'neutral');
     return '<div class="tx-row" data-id="' + t.id + '">' +
+      '<div class="tx-row-catcol">' +
+      '<span class="cat-icon-circle" style="background:var(--series-' + slot + ')"><i class="bi ' + icon + '"></i></span>' +
+      '<span class="tx-row-catname">' + Fmt.escapeHTML(catLabel) + '</span>' +
+      '</div>' +
       '<div class="tx-row-main">' +
-      '<div class="tx-row-cat">' + Fmt.escapeHTML(catLabel) + '</div>' +
-      '<div class="tx-row-sub">' + subParts.join(' &middot; ') + '</div>' +
+      '<div class="tx-row-note">' + noteText + '</div>' +
+      '<div class="tx-row-account">' + accountParts.join(' &middot; ') + '</div>' +
       '</div>' +
       '<div class="tx-row-amount amount-text ' + cls + '">' + sign + Fmt.formatRupiah(Math.abs(t.amount)) + '</div>' +
       '</div>';
@@ -99,11 +105,12 @@
   function dayGroupHTML(g) {
     return '<div class="tx-day">' +
       '<div class="tx-day-head">' +
-      '<div class="tx-day-datebox"><span class="tx-day-dom">' + Fmt.dayOfMonth(g.date) + '</span><span class="tx-day-dow">' + Fmt.formatDayAbbr(g.date) + '</span></div>' +
-      '<div class="tx-day-label">' + Fmt.formatMonthYear(g.date) + '</div>' +
+      '<span class="tx-day-dom">' + Fmt.dayOfMonth(g.date) + '</span>' +
+      '<span class="tx-day-dow-badge">' + Fmt.formatDayAbbr(g.date) + '</span>' +
+      '<span class="tx-day-monthyear">' + Fmt.formatMonthYearNumeric(g.date) + '</span>' +
       '<div class="tx-day-sums">' +
-      '<span class="amount-text up">+' + Fmt.formatRupiah(g.income) + '</span>' +
-      '<span class="amount-text down">-' + Fmt.formatRupiah(g.expense) + '</span>' +
+      '<span class="amount-text up">' + Fmt.formatRupiah(g.income) + '</span>' +
+      '<span class="amount-text down">' + Fmt.formatRupiah(g.expense) + '</span>' +
       '</div></div>' +
       '<div class="tx-day-items">' + g.items.map(rowHTML).join('') + '</div>' +
       '</div>';
@@ -196,8 +203,8 @@
       '<div class="tx-day-head">' +
       '<div class="tx-day-label" style="font-size:15px;">' + Fmt.formatMonthYear(g.date) + '</div>' +
       '<div class="tx-day-sums">' +
-      '<span class="amount-text up">+' + Fmt.formatRupiah(g.income) + '</span>' +
-      '<span class="amount-text down">-' + Fmt.formatRupiah(g.expense) + '</span>' +
+      '<span class="amount-text up">' + Fmt.formatRupiah(g.income) + '</span>' +
+      '<span class="amount-text down">' + Fmt.formatRupiah(g.expense) + '</span>' +
       '</div></div>' +
       '<div class="tx-day-items">' + g.items.map(rowHTML).join('') + '</div>' +
       '</div>';

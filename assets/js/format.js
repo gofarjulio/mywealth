@@ -49,6 +49,12 @@
     return MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
   }
 
+  function formatMonthYearNumeric(iso) {
+    var d = parseISODate(iso);
+    var mm = d.getMonth() + 1;
+    return (mm < 10 ? '0' + mm : '' + mm) + '.' + d.getFullYear();
+  }
+
   function debounce(fn, wait) {
     var t = null;
     return function () {
@@ -79,6 +85,7 @@
     formatDayAbbr: formatDayAbbr,
     dayOfMonth: dayOfMonth,
     formatMonthYear: formatMonthYear,
+    formatMonthYearNumeric: formatMonthYearNumeric,
     debounce: debounce,
     escapeHTML: escapeHTML,
     cssVar: cssVar,

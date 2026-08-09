@@ -477,6 +477,16 @@
     notify('asset-account-added');
   }
 
+  async function updateAssetAccount(id, patch) {
+    var payload = {};
+    if (patch.name) payload.name = patch.name;
+    if (patch.category) payload.category = patch.category;
+    var res = await sb.from('asset_accounts').update(payload).eq('id', id);
+    if (res.error) throw res.error;
+    await fetchAssetData();
+    notify('asset-account-updated');
+  }
+
   async function deleteAssetAccount(id) {
     var res = await sb.from('asset_accounts').delete().eq('id', id);
     if (res.error) throw res.error;
@@ -486,7 +496,9 @@
 
   async function addAssetSnapshots(entries) {
     var payload = entries.map(function (e) {
-      return { family_id: cache.familyId, asset_account_id: e.accountId, amount: Number(e.amount) || 0, created_by: cache.memberId };
+      var row = { family_id: cache.familyId, asset_account_id: e.accountId, amount: Number(e.amount) || 0, created_by: cache.memberId };
+      if (e.createdAt) row.created_at = e.createdAt;
+      return row;
     });
     var res = await sb.from('asset_snapshots').insert(payload);
     if (res.error) throw res.error;
@@ -515,7 +527,7 @@
     getBudgets: getBudgets, getBudget: getBudget, setBudget: setBudget,
     setNetWorthTarget: setNetWorthTarget,
     fetchAssetData: fetchAssetData, getAssetAccounts: getAssetAccounts, getAssetSnapshots: getAssetSnapshots,
-    addAssetAccount: addAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, deleteAssetSnapshot: deleteAssetSnapshot,
+    addAssetAccount: addAssetAccount, updateAssetAccount: updateAssetAccount, deleteAssetAccount: deleteAssetAccount, addAssetSnapshots: addAssetSnapshots, deleteAssetSnapshot: deleteAssetSnapshot,
     exportJSON: exportJSON, todayISO: todayISO
   };
 })(window);

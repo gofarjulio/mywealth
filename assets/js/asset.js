@@ -182,6 +182,8 @@
   function renderUpdateTab() {
     var target = Store.getSettings().netWorthTarget || 0;
     document.getElementById('targetInput').value = target ? Number(target).toLocaleString('id-ID') : '';
+    var dateInput = document.getElementById('updateDateInput');
+    if (!dateInput.value) dateInput.value = Store.todayISO();
 
     var accounts = Store.getAssetAccounts();
     var today = Store.todayISO();
@@ -205,6 +207,7 @@
           '<span class="asset-update-last">Last: ' + (last == null ? '-' : Fmt.formatRupiah(last)) + '</span></div>' +
           '<div class="rp-input-group asset-update-input-wrap"><span class="rp-prefix">Rp</span>' +
           '<input type="text" inputmode="numeric" class="form-control form-control-sm asset-update-input" placeholder="' + (last == null ? '0' : Number(last).toLocaleString('id-ID')) + '"></div>' +
+          '<button class="btn btn-sm asset-edit-btn" data-edit-id="' + a.id + '" title="Edit"><i class="bi bi-pencil"></i></button>' +
           '<button class="btn btn-sm asset-del-btn" data-del-id="' + a.id + '" title="Remove"><i class="bi bi-trash3"></i></button>' +
           '</div>';
       });
@@ -212,6 +215,17 @@
     host.innerHTML = html;
 
     host.querySelectorAll('.asset-update-input').forEach(function (el) { formatAmountInput(el); });
+    host.querySelectorAll('.asset-edit-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-edit-id');
+        var account = Store.getAssetAccounts().find(function (a) { return a.id === id; });
+        if (!account) return;
+        document.getElementById('editAssetId').value = account.id;
+        document.getElementById('editAssetName').value = account.name;
+        document.getElementById('editAssetCategory').value = account.category;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('editAssetAccountModal')).show();
+      });
+    });
     host.querySelectorAll('.asset-del-btn').forEach(function (btn) {
       btn.addEventListener('click', async function () {
         if (!confirm('Remove this account? Its update history will be deleted too.')) return;
@@ -335,12 +349,16 @@
 
     document.getElementById('saveUpdatesBtn').addEventListener('click', async function () {
       var rows = document.querySelectorAll('.asset-update-row');
+      var dateVal = document.getElementById('updateDateInput').value || Store.todayISO();
+      var now = new Date();
+      var timeStr = pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds());
+      var createdAt = dateVal + 'T' + timeStr;
       var entries = [];
       rows.forEach(function (row) {
         var input = row.querySelector('.asset-update-input');
         var raw = input.value.replace(/\D/g, '');
         if (raw === '') return;
-        entries.push({ accountId: row.getAttribute('data-id'), amount: Number(raw) });
+        entries.push({ accountId: row.getAttribute('data-id'), amount: Number(raw), createdAt: createdAt });
       });
       if (!entries.length) { alert('No values entered.'); return; }
       var btn = this;
@@ -364,6 +382,19 @@
         this.reset();
       } catch (err) {
         alert('Failed to add account: ' + (err.message || err));
+      }
+    });
+
+    document.getElementById('saveEditAssetBtn').addEventListener('click', async function () {
+      var id = document.getElementById('editAssetId').value;
+      var name = document.getElementById('editAssetName').value.trim();
+      var category = document.getElementById('editAssetCategory').value;
+      if (!name) return;
+      try {
+        await Store.updateAssetAccount(id, { name: name, category: category });
+        bootstrap.Modal.getInstance(document.getElementById('editAssetAccountModal')).hide();
+      } catch (err) {
+        alert('Failed to save changes: ' + (err.message || err));
       }
     });
   });

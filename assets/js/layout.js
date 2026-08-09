@@ -27,7 +27,7 @@
 
   function brandHTML(collapsible) {
     return '<div class="sidebar-brand" id="sidebarBrand">' +
-      '<div class="brand-mark">MW</div>' +
+      '<img class="brand-mark" src="assets/icons/icon-192.png" alt="MyWealth">' +
       '<div class="brand-text-wrap"><div class="brand-text">MyWealth</div><div class="brand-sub">Portal Keuangan Keluarga</div></div>' +
       (collapsible ? '<button type="button" class="sidebar-toggle" id="sidebarToggleBtn" title="Tutup sidebar" aria-label="Tutup sidebar"><i class="bi bi-chevron-left"></i></button>' : '') +
       '</div>';

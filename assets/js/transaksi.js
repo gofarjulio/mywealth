@@ -228,13 +228,26 @@
     document.getElementById('monthlyExpenseVal').textContent = Fmt.formatRupiah(t.expense);
     document.getElementById('monthlyTotalVal').textContent = Fmt.formatRupiah(t.balance);
 
-    if (!list.length) {
+    var byKey = {};
+    groupByMonth(list).forEach(function (g) { byKey[g.key] = g; });
+
+    var today = new Date();
+    var lastMonthIndex = periodYear === today.getFullYear() ? today.getMonth()
+      : (periodYear < today.getFullYear() ? 11 : -1);
+
+    var allGroups = [];
+    for (var m = lastMonthIndex; m >= 0; m--) {
+      var key = periodYear + '-' + pad2(m + 1);
+      allGroups.push(byKey[key] || { key: key, date: key + '-01', items: [], income: 0, expense: 0 });
+    }
+
+    if (!allGroups.length) {
       host.innerHTML = '';
       empty.classList.remove('d-none');
       return;
     }
     empty.classList.add('d-none');
-    host.innerHTML = groupByMonth(list).map(monthGroupHTML).join('');
+    host.innerHTML = allGroups.map(monthGroupHTML).join('');
   }
 
   // ---------------- Total tab ----------------

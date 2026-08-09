@@ -3,8 +3,8 @@
 -- Jalankan SETELAH 017_import_mm_transactions_setup.sql.
 
 with fam as (select id from families limit 1),
-acc as (select id, name from accounts a, fam where a.family_id = fam.id),
-cat as (select id, name, type from categories c, fam where c.family_id = fam.id)
+acc as (select a.id, a.name from accounts a, fam where a.family_id = fam.id),
+cat as (select c.id, c.name, c.type from categories c, fam where c.family_id = fam.id)
 insert into transactions (family_id, tx_date, tx_time, type, amount, category_id, account_id, note)
 select fam.id, v.tx_date::date, v.tx_time::time, v.tx_type, v.amount, cat.id, acc.id, v.note
 from fam, acc, cat, (values

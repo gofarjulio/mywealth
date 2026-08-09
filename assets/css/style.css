@@ -377,6 +377,18 @@ a { text-decoration: none; }
 }
 .tx-row-amount { font-size: 14px; white-space: nowrap; flex-shrink: 0; }
 
+/* ---------------- Monthly summary rows ---------------- */
+.tx-month-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 4px; border-bottom: 1px solid var(--gridline);
+}
+.tx-month-row:last-child { border-bottom: none; }
+.tx-month-label { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; color: var(--text-primary); }
+.tx-month-income { width: 110px; flex-shrink: 0; text-align: right; font-size: 14px; }
+.tx-month-expense-col { width: 130px; flex-shrink: 0; text-align: right; }
+.tx-month-expense-col .amount-text { font-size: 14px; }
+.tx-month-net { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
 /* ---------------- Legend ---------------- */
 .mw-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .mw-legend li { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; }

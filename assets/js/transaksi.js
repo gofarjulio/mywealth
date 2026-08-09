@@ -13,7 +13,9 @@
   function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
 
   function renderPeriodNav() {
-    document.getElementById('periodLabel').textContent = Fmt.formatMonthYear(toISO(new Date(periodYear, periodMonth, 1)));
+    document.getElementById('periodLabel').textContent = activeTab === 'monthly'
+      ? String(periodYear)
+      : Fmt.formatMonthYear(toISO(new Date(periodYear, periodMonth, 1)));
   }
 
   function applyPeriodToFilters() {
@@ -199,21 +201,33 @@
   }
 
   function monthGroupHTML(g) {
-    return '<div class="tx-day">' +
-      '<div class="tx-day-head">' +
-      '<div class="tx-day-label" style="font-size:15px;">' + Fmt.formatMonthYear(g.date) + '</div>' +
-      '<div class="tx-day-sums">' +
-      '<span class="amount-text up">' + Fmt.formatRupiah(g.income) + '</span>' +
-      '<span class="amount-text down">' + Fmt.formatRupiah(g.expense) + '</span>' +
-      '</div></div>' +
-      '<div class="tx-day-items">' + g.items.map(rowHTML).join('') + '</div>' +
-      '</div>';
+    var net = g.income - g.expense;
+    return '<div class="tx-month-row">' +
+      '<div class="tx-month-label">' + Fmt.formatMonthAbbr(g.date) + '</div>' +
+      '<div class="tx-month-income amount-text up">' + Fmt.formatRupiah(g.income) + '</div>' +
+      '<div class="tx-month-expense-col">' +
+      '<div class="amount-text down">' + Fmt.formatRupiah(g.expense) + '</div>' +
+      '<div class="tx-month-net">' + Fmt.formatRupiah(net) + '</div>' +
+      '</div></div>';
+  }
+
+  function monthlyFilters() {
+    var f = currentFilters();
+    f.start = periodYear + '-01-01';
+    f.end = periodYear + '-12-31';
+    return f;
   }
 
   function renderMonthly() {
-    var list = Store.getTransactions(currentFilters());
+    var list = Store.getTransactions(monthlyFilters());
     var host = document.getElementById('monthlyList');
     var empty = document.getElementById('monthlyEmpty');
+
+    var t = computeTotals(list);
+    document.getElementById('monthlyIncomeVal').textContent = Fmt.formatRupiah(t.income);
+    document.getElementById('monthlyExpenseVal').textContent = Fmt.formatRupiah(t.expense);
+    document.getElementById('monthlyTotalVal').textContent = Fmt.formatRupiah(t.balance);
+
     if (!list.length) {
       host.innerHTML = '';
       empty.classList.remove('d-none');
@@ -221,7 +235,6 @@
     }
     empty.classList.add('d-none');
     host.innerHTML = groupByMonth(list).map(monthGroupHTML).join('');
-    wireRowClicks(host);
   }
 
   // ---------------- Total tab ----------------
@@ -351,6 +364,7 @@
       document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('d-none', t !== tab);
     });
     document.getElementById('filterPanel').classList.toggle('d-none', tab === 'note');
+    renderPeriodNav();
     renderActiveTab();
   }
 
@@ -368,16 +382,24 @@
     });
 
     document.getElementById('periodPrevBtn').addEventListener('click', function () {
-      periodMonth -= 1;
-      if (periodMonth < 0) { periodMonth = 11; periodYear -= 1; }
+      if (activeTab === 'monthly') {
+        periodYear -= 1;
+      } else {
+        periodMonth -= 1;
+        if (periodMonth < 0) { periodMonth = 11; periodYear -= 1; }
+      }
       calSelectedDate = null;
       applyPeriodToFilters();
       renderPeriodNav();
       renderActiveTab();
     });
     document.getElementById('periodNextBtn').addEventListener('click', function () {
-      periodMonth += 1;
-      if (periodMonth > 11) { periodMonth = 0; periodYear += 1; }
+      if (activeTab === 'monthly') {
+        periodYear += 1;
+      } else {
+        periodMonth += 1;
+        if (periodMonth > 11) { periodMonth = 0; periodYear += 1; }
+      }
       calSelectedDate = null;
       applyPeriodToFilters();
       renderPeriodNav();

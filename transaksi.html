@@ -106,8 +106,14 @@
       </div>
 
       <div class="tx-tabpane d-none" id="tabMonthly">
+        <div class="mw-card mb-3">
+          <div class="tx-summary-row">
+            <div class="tx-summary-item"><div class="tx-summary-label">Income</div><div class="tx-summary-value up" id="monthlyIncomeVal">Rp0</div></div>
+            <div class="tx-summary-item"><div class="tx-summary-label">Expenses</div><div class="tx-summary-value down" id="monthlyExpenseVal">Rp0</div></div>
+            <div class="tx-summary-item"><div class="tx-summary-label">Total</div><div class="tx-summary-value" id="monthlyTotalVal">Rp0</div></div>
+          </div>
+        </div>
         <div class="mw-card">
-          <div class="mw-card-header"><div><h3>Monthly Summary</h3></div></div>
           <div id="monthlyList"></div>
           <div class="empty-state d-none" id="monthlyEmpty"><i class="bi bi-inbox"></i>No transactions match the filters.</div>
         </div>

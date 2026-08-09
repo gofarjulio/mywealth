@@ -92,6 +92,13 @@
     renderMembers();
   }
 
+  function updateEditPinHint() {
+    var hasPin = !!Store.getSettings().editPin;
+    document.getElementById('editPinHint').textContent = hasPin
+      ? 'A PIN is set. Enter it as Current PIN above to change or remove it.'
+      : 'No PIN set yet. Enter a New PIN below to require it for editing/deleting entries in Asset > Update History.';
+  }
+
   function populateMonthStartDayOptions() {
     var html = '';
     for (var d = 1; d <= 28; d++) html += '<option value="' + d + '">' + d + '</option>';
@@ -107,7 +114,7 @@
 
     document.getElementById('familyNameInput').value = Store.getSettings().familyName;
     document.getElementById('darkModeSwitch').checked = document.documentElement.getAttribute('data-theme') === 'dark';
-    document.getElementById('editPinInput').value = Store.getSettings().editPin;
+    updateEditPinHint();
 
     populateMonthStartDayOptions();
     document.getElementById('monthStartDayInput').value = Store.getSettings().monthStartDay;
@@ -144,9 +151,25 @@
 
     document.getElementById('editPinForm').addEventListener('submit', async function (e) {
       e.preventDefault();
+      var form = this;
+      var currentPin = document.getElementById('currentPinInput').value;
+      var newPin = document.getElementById('newPinInput').value;
+      var confirmPin = document.getElementById('confirmPinInput').value;
+      var existingPin = Store.getSettings().editPin;
+
+      if (existingPin && currentPin !== existingPin) {
+        alert('Current PIN is incorrect.');
+        return;
+      }
+      if (newPin !== confirmPin) {
+        alert('New PIN and confirmation do not match.');
+        return;
+      }
       try {
-        await Store.setEditPin(document.getElementById('editPinInput').value);
-        alert(document.getElementById('editPinInput').value.trim() ? 'Edit PIN saved.' : 'Edit PIN disabled.');
+        await Store.setEditPin(newPin);
+        form.reset();
+        updateEditPinHint();
+        alert(newPin.trim() ? 'Edit PIN saved.' : 'Edit PIN disabled.');
       } catch (err) {
         alert('Failed to save Edit PIN: ' + (err.message || err));
       }

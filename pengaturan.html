@@ -79,11 +79,13 @@
               </div>
               <div>
                 <label class="form-label">Edit PIN (Asset &gt; Update History)</label>
-                <form class="d-flex gap-2" id="editPinForm">
-                  <input type="password" class="form-control form-control-sm" id="editPinInput" placeholder="No PIN set" autocomplete="off" style="max-width:160px;">
-                  <button class="btn btn-sm btn-outline-secondary" type="submit">Save</button>
+                <form class="d-flex flex-column gap-2" id="editPinForm" style="max-width:220px;">
+                  <input type="password" class="form-control form-control-sm" id="currentPinInput" placeholder="Current PIN" autocomplete="off">
+                  <input type="password" class="form-control form-control-sm" id="newPinInput" placeholder="New PIN" autocomplete="off">
+                  <input type="password" class="form-control form-control-sm" id="confirmPinInput" placeholder="Confirm new PIN" autocomplete="off">
+                  <button class="btn btn-sm btn-outline-secondary" type="submit">Save PIN</button>
                 </form>
-                <div class="form-text">Required to edit or delete entries in Asset &gt; Update History. Leave blank and save to disable.</div>
+                <div class="form-text" id="editPinHint">Required to edit or delete entries in Asset &gt; Update History. Leave New PIN blank to disable.</div>
               </div>
             </div>
           </div>

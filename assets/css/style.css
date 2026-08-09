@@ -416,6 +416,23 @@ a { text-decoration: none; }
 .account-card .acc-top { display: flex; align-items: center; gap: 10px; }
 .account-card .acc-actions { display: flex; gap: 6px; margin-top: 6px; }
 
+/* ---------------- Transaksi page: search box ---------------- */
+.tx-search-box {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-width: 0; max-width: 320px;
+  padding: 7px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.tx-search-box i { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+.tx-search-box input {
+  border: none; outline: none; background: none;
+  font-size: 13.5px; color: var(--text-primary);
+  width: 100%; min-width: 0;
+}
+.tx-search-box input::placeholder { color: var(--text-muted); }
+
 /* ---------------- Transaksi page: period nav ---------------- */
 .tx-period-nav { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; }
 .tx-period-label { font-size: 15px; font-weight: 700; color: var(--text-primary); min-width: 140px; text-align: center; }

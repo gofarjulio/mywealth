@@ -16,7 +16,7 @@
     var goodDirection = isFlat ? 'flat' : ((isUp === goodWhenUp) ? 'up' : 'down');
     var arrow = isFlat ? 'bi-dash' : (isUp ? 'bi-arrow-up-short' : 'bi-arrow-down-short');
     deltaEl.className = 'stat-delta ' + goodDirection;
-    deltaEl.innerHTML = '<i class="bi ' + arrow + '"></i>' + Math.abs(pct).toFixed(1) + '% vs periode lalu';
+    deltaEl.innerHTML = '<i class="bi ' + arrow + '"></i>' + Math.abs(pct).toFixed(1) + '% vs last period';
   }
 
   function renderRecentTransactions() {
@@ -28,7 +28,7 @@
     body.innerHTML = list.map(function (t) {
       var cat = Store.findCategory(t.category);
       var acc = Store.getAccount(t.account_id);
-      var label = cat ? cat.name : (t.type === 'transfer' ? 'Transfer' : 'Penyesuaian');
+      var label = cat ? cat.name : (t.type === 'transfer' ? 'Transfer' : 'Adjustment');
       var icon = cat ? cat.icon : (t.type === 'transfer' ? 'bi-arrow-left-right' : 'bi-sliders');
       var slot = cat ? cat.colorSlot : (t.type === 'transfer' ? 1 : 8);
       var sign = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : (t.amount < 0 ? '-' : '+'));

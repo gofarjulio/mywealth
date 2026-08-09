@@ -70,13 +70,13 @@
         labels: rows.map(function (r) { return r.label; }),
         datasets: [
           {
-            label: 'Pemasukan', data: rows.map(function (r) { return r.income; }),
+            label: 'Income', data: rows.map(function (r) { return r.income; }),
             borderColor: incomeColor, backgroundColor: hexToRgba(incomeColor, 0.1),
             borderWidth: 2, pointRadius: 4, pointHoverRadius: 5, pointBackgroundColor: incomeColor,
             pointBorderColor: Fmt.cssVar('--surface-1'), pointBorderWidth: 2, tension: 0.25, fill: true
           },
           {
-            label: 'Pengeluaran', data: rows.map(function (r) { return r.expense; }),
+            label: 'Expenses', data: rows.map(function (r) { return r.expense; }),
             borderColor: expenseColor, backgroundColor: hexToRgba(expenseColor, 0.1),
             borderWidth: 2, pointRadius: 4, pointHoverRadius: 5, pointBackgroundColor: expenseColor,
             pointBorderColor: Fmt.cssVar('--surface-1'), pointBorderWidth: 2, tension: 0.25, fill: true
@@ -113,7 +113,7 @@
   function exportCSV() {
     var monthsBack = Number(document.getElementById('trendMonths').value);
     var rows = Store.monthlyTrend(monthsBack);
-    var lines = ['Bulan,Pemasukan,Pengeluaran,Selisih'];
+    var lines = ['Month,Income,Expenses,Difference'];
     rows.forEach(function (r) {
       lines.push([r.label, r.income, r.expense, r.income - r.expense].join(','));
     });
@@ -121,7 +121,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'mywealth-laporan-' + Store.todayISO() + '.csv';
+    a.download = 'mywealth-report-' + Store.todayISO() + '.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -152,11 +152,11 @@
       if (showingTable) {
         tableWrap.classList.add('d-none');
         chartWrap.classList.remove('d-none');
-        this.textContent = 'Tampilan Tabel';
+        this.textContent = 'Table View';
       } else {
         tableWrap.classList.remove('d-none');
         chartWrap.classList.add('d-none');
-        this.textContent = 'Tampilan Grafik';
+        this.textContent = 'Chart View';
       }
     });
   });

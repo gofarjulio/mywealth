@@ -4,18 +4,18 @@
   var Fmt = window.MW.Format;
 
   var ICON_CHOICES = [
-    { value: 'bi-tag', label: 'Umum' },
-    { value: 'bi-cup-hot', label: 'Makanan' },
-    { value: 'bi-train-front', label: 'Transportasi' },
-    { value: 'bi-lightning-charge', label: 'Tagihan' },
-    { value: 'bi-bag', label: 'Belanja' },
-    { value: 'bi-heart-pulse', label: 'Kesehatan' },
-    { value: 'bi-film', label: 'Hiburan' },
-    { value: 'bi-mortarboard', label: 'Pendidikan' },
-    { value: 'bi-house', label: 'Rumah' },
-    { value: 'bi-briefcase', label: 'Gaji' },
+    { value: 'bi-tag', label: 'General' },
+    { value: 'bi-cup-hot', label: 'Food' },
+    { value: 'bi-train-front', label: 'Transportation' },
+    { value: 'bi-lightning-charge', label: 'Bills' },
+    { value: 'bi-bag', label: 'Shopping' },
+    { value: 'bi-heart-pulse', label: 'Health' },
+    { value: 'bi-film', label: 'Entertainment' },
+    { value: 'bi-mortarboard', label: 'Education' },
+    { value: 'bi-house', label: 'Home' },
+    { value: 'bi-briefcase', label: 'Salary' },
     { value: 'bi-gift', label: 'Bonus' },
-    { value: 'bi-graph-up-arrow', label: 'Investasi' }
+    { value: 'bi-graph-up-arrow', label: 'Investment' }
   ];
 
   function populateIconSelects() {
@@ -27,16 +27,16 @@
   function renderCategoryList(type, hostId) {
     var cats = Store.getCategories(type);
     var host = document.getElementById(hostId);
-    if (!cats.length) { host.innerHTML = '<li class="text-muted-mw">Belum ada kategori.</li>'; return; }
+    if (!cats.length) { host.innerHTML = '<li class="text-muted-mw">No categories yet.</li>'; return; }
     host.innerHTML = cats.map(function (c) {
       return '<li><span class="legend-left"><span class="cat-icon-circle" style="width:26px;height:26px;font-size:11px;background:var(--series-' + c.colorSlot + ')"><i class="bi ' + c.icon + '"></i></span>' + Fmt.escapeHTML(c.name) + '</span>' +
         '<button class="btn btn-sm" data-type="' + type + '" data-id="' + c.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-trash3"></i></button></li>';
     }).join('');
     host.querySelectorAll('button[data-id]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        if (!confirm('Hapus kategori ini?')) return;
+        if (!confirm('Delete this category?')) return;
         var res = await Store.deleteCategory(btn.getAttribute('data-type'), btn.getAttribute('data-id'));
-        if (!res.ok) alert('Kategori tidak dapat dihapus karena masih dipakai pada transaksi.');
+        if (!res.ok) alert('This category cannot be deleted because it is still used by transactions.');
       });
     });
   }
@@ -45,11 +45,11 @@
     var members = Store.getMembers();
     var activeId = Store.getSettings().activeMemberId;
     var host = document.getElementById('memberList');
-    if (!members.length) { host.innerHTML = '<li class="text-muted-mw">Belum ada anggota.</li>'; return; }
+    if (!members.length) { host.innerHTML = '<li class="text-muted-mw">No members yet.</li>'; return; }
     host.innerHTML = members.map(function (m) {
       return '<li><span class="legend-left"><span class="avatar-circle" style="width:26px;height:26px;font-size:10px;">' + m.initials + '</span>' +
         Fmt.escapeHTML(m.name) + ' <span class="text-muted-mw" style="font-size:12px;">(' + m.role + ')</span>' +
-        (m.id === activeId ? ' <span class="type-badge income" style="margin-left:6px;">Aktif</span>' : '') + '</span>' +
+        (m.id === activeId ? ' <span class="type-badge income" style="margin-left:6px;">Active</span>' : '') + '</span>' +
         '<span>' +
         '<button class="btn btn-sm" data-edit-id="' + m.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-pencil"></i></button>' +
         '<button class="btn btn-sm" data-id="' + m.id + '" style="border:none;color:var(--text-muted);"><i class="bi bi-trash3"></i></button>' +
@@ -59,28 +59,28 @@
       btn.addEventListener('click', async function () {
         var m = members.find(function (x) { return x.id === btn.getAttribute('data-edit-id'); });
         if (!m) return;
-        var newName = prompt('Nama anggota:', m.name);
+        var newName = prompt('Member name:', m.name);
         if (newName === null) return;
         newName = newName.trim();
         if (!newName) return;
-        var newRole = prompt('Peran (mis. Suami/Istri/Anak):', m.role);
+        var newRole = prompt('Role (e.g. Husband/Wife/Child):', m.role);
         if (newRole === null) return;
         newRole = newRole.trim() || m.role;
         try {
           await Store.updateMember(m.id, { name: newName, role: newRole });
         } catch (err) {
-          alert('Gagal mengubah anggota: ' + (err.message || err));
+          alert('Failed to update member: ' + (err.message || err));
         }
       });
     });
     host.querySelectorAll('button[data-id]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        if (!confirm('Hapus anggota ini?')) return;
+        if (!confirm('Delete this member?')) return;
         var res = await Store.deleteMember(btn.getAttribute('data-id'));
         if (!res.ok) {
-          if (res.reason === 'self') alert('Anda tidak bisa menghapus akun Anda sendiri yang sedang login.');
-          else if (res.reason === 'linked') alert('Anggota ini masih punya akses login aktif. Hapus dulu user-nya lewat Supabase Authentication sebelum menghapus data anggota ini di sini.');
-          else alert('Gagal menghapus anggota.');
+          if (res.reason === 'self') alert('You cannot delete your own account while signed in.');
+          else if (res.reason === 'linked') alert('This member still has active login access. Delete their user via Supabase Authentication first before deleting this member record here.');
+          else alert('Failed to delete member.');
         }
       });
     });
@@ -128,7 +128,7 @@
     });
 
     document.getElementById('familyNameInput').addEventListener('change', async function () {
-      await Store.updateSettings({ familyName: this.value.trim() || 'Keluarga' });
+      await Store.updateSettings({ familyName: this.value.trim() || 'Family' });
     });
 
     document.getElementById('darkModeSwitch').addEventListener('change', function () {

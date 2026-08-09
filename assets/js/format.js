@@ -12,14 +12,14 @@
     var num = Number(n) || 0;
     var sign = num < 0 ? '-' : '';
     var abs = Math.abs(num);
-    if (abs >= 1e9) return sign + 'Rp' + (abs / 1e9).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (abs >= 1e6) return sign + 'Rp' + (abs / 1e6).toFixed(1).replace(/\.0$/, '') + 'Jt';
-    if (abs >= 1e3) return sign + 'Rp' + (abs / 1e3).toFixed(0) + 'rb';
+    if (abs >= 1e9) return sign + 'Rp' + (abs / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (abs >= 1e6) return sign + 'Rp' + (abs / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (abs >= 1e3) return sign + 'Rp' + (abs / 1e3).toFixed(0) + 'K';
     return formatRupiah(num);
   }
 
-  var DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  var MONTH_NAMES = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   function parseISODate(iso) {
     var parts = (iso || '').split('-').map(Number);

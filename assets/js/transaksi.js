@@ -25,14 +25,14 @@
     var catSelect = document.getElementById('filterCategory');
     var prevCat = catSelect.value;
     var allCats = Store.getCategories('expense').concat(Store.getCategories('income'));
-    catSelect.innerHTML = '<option value="">Semua</option>' + allCats.map(function (c) {
+    catSelect.innerHTML = '<option value="">All</option>' + allCats.map(function (c) {
       return '<option value="' + c.id + '">' + c.name + '</option>';
     }).join('');
     catSelect.value = prevCat;
 
     var accSelect = document.getElementById('filterAccount');
     var prevAcc = accSelect.value;
-    accSelect.innerHTML = '<option value="">Semua</option>' + Store.getAccounts().map(function (a) {
+    accSelect.innerHTML = '<option value="">All</option>' + Store.getAccounts().map(function (a) {
       return '<option value="' + a.id + '">' + a.name + '</option>';
     }).join('');
     accSelect.value = prevAcc;
@@ -56,7 +56,7 @@
     var accountLabel = toAcc
       ? Fmt.escapeHTML(acc ? acc.name : '-') + ' <i class="bi bi-arrow-right mx-1 text-muted-mw"></i> ' + Fmt.escapeHTML(toAcc.name)
       : Fmt.escapeHTML(acc ? acc.name : '-');
-    var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer Antar Akun' : 'Penyesuaian Saldo');
+    var catLabel = cat ? cat.name : (t.type === 'transfer' ? 'Transfer Between Accounts' : 'Balance Adjustment');
     var author = Store.findMember(t.created_by);
     var subParts = [accountLabel];
     if (t.note) subParts.push(Fmt.escapeHTML(t.note));
@@ -122,7 +122,7 @@
     var list = Store.getTransactions(currentFilters());
     var host = document.getElementById('txList');
     var empty = document.getElementById('txEmpty');
-    document.getElementById('txCountLabel').textContent = list.length + ' transaksi';
+    document.getElementById('txCountLabel').textContent = list.length + ' transactions';
 
     var t = computeTotals(list);
     document.getElementById('dailyIncomeVal').textContent = Fmt.formatRupiah(t.income);
@@ -205,7 +205,7 @@
     document.getElementById('calDayTitle').textContent = Fmt.formatDateLong(calSelectedDate);
     var listHost = document.getElementById('calDayList');
     if (!list.length) {
-      listHost.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i>Tidak ada transaksi di tanggal ini.</div>';
+      listHost.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i>No transactions on this date.</div>';
     } else {
       listHost.innerHTML = list.map(rowHTML).join('');
       wireRowClicks(listHost);
@@ -224,10 +224,10 @@
 
     var daysInMonth = new Date(periodYear, periodMonth + 1, 0).getDate();
     var jsStartDay = new Date(periodYear, periodMonth, 1).getDay();
-    var startOffset = (jsStartDay + 6) % 7; // 0=Senin ... 6=Minggu
+    var startOffset = (jsStartDay + 6) % 7; // 0=Monday ... 6=Sunday
     var todayIso = Store.todayISO();
 
-    var cells = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(function (d) {
+    var cells = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) {
       return '<div class="cal-dow">' + d + '</div>';
     }).join('');
     for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
@@ -281,11 +281,11 @@
     }).join('');
     host.querySelectorAll('button[data-id]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        if (!confirm('Hapus catatan ini?')) return;
+        if (!confirm('Delete this note?')) return;
         try {
           await Store.deleteNote(btn.getAttribute('data-id'));
         } catch (err) {
-          alert('Gagal menghapus catatan: ' + (err.message || err));
+          alert('Failed to delete note: ' + (err.message || err));
         }
       });
     });
@@ -364,7 +364,7 @@
         await Store.addNote(val);
         input.value = '';
       } catch (err) {
-        alert('Gagal menyimpan catatan: ' + (err.message || err));
+        alert('Failed to save note: ' + (err.message || err));
       }
     });
   });

@@ -2,7 +2,7 @@
   'use strict';
   var Store = window.MW.Store;
   var Fmt = window.MW.Format;
-  var GROUP_ORDER = ['Kas & Bank', 'Dompet Digital', 'Aset & Investasi', 'Kartu Kredit/Hutang'];
+  var GROUP_ORDER = ['Cash & Bank', 'Digital Wallet', 'Assets & Investments', 'Credit Card/Debt'];
 
   var accountModal, adjustModal;
 
@@ -20,7 +20,7 @@
   }
 
   function groupIcon(g) {
-    return { 'Kas & Bank': 'bi-bank', 'Dompet Digital': 'bi-wallet2', 'Aset & Investasi': 'bi-gem', 'Kartu Kredit/Hutang': 'bi-credit-card' }[g] || 'bi-folder2';
+    return { 'Cash & Bank': 'bi-bank', 'Digital Wallet': 'bi-wallet2', 'Assets & Investments': 'bi-gem', 'Credit Card/Debt': 'bi-credit-card' }[g] || 'bi-folder2';
   }
 
   function renderGroups() {
@@ -31,7 +31,7 @@
 
     var host = document.getElementById('accountGroups');
     if (!accounts.length) {
-      host.innerHTML = '<div class="mw-card"><div class="empty-state"><i class="bi bi-wallet2"></i>Belum ada akun. Tambahkan akun pertama Anda.</div></div>';
+      host.innerHTML = '<div class="mw-card"><div class="empty-state"><i class="bi bi-wallet2"></i>No accounts yet. Add your first account.</div></div>';
       return;
     }
 
@@ -40,7 +40,7 @@
       var groupTotal = list.reduce(function (s, a) { return s + a.balance; }, 0);
       return '<div class="mw-card mb-3">' +
         '<div class="mw-card-header"><div><h3><i class="bi ' + groupIcon(g) + ' me-2 text-muted-mw"></i>' + g + '</h3></div>' +
-        '<span class="group-total">' + list.length + ' akun &middot; ' + Fmt.formatRupiah(groupTotal) + '</span></div>' +
+        '<span class="group-total">' + list.length + ' accounts &middot; ' + Fmt.formatRupiah(groupTotal) + '</span></div>' +
         '<div class="row g-3">' + list.map(function (a) { return accountCardHTML(a); }).join('') + '</div>' +
         '</div>';
     }).join('');
@@ -50,9 +50,9 @@
     });
     host.querySelectorAll('[data-action="delete-acc"]').forEach(function (btn) {
       btn.addEventListener('click', async function () {
-        if (!confirm('Hapus akun ini?')) return;
+        if (!confirm('Delete this account?')) return;
         var res = await Store.deleteAccount(btn.getAttribute('data-id'));
-        if (!res.ok) alert('Akun tidak dapat dihapus karena masih memiliki riwayat transaksi. Hapus atau pindahkan transaksinya terlebih dahulu.');
+        if (!res.ok) alert('This account cannot be deleted because it still has transaction history. Delete or move its transactions first.');
       });
     });
     host.querySelectorAll('[data-action="adjust"]').forEach(function (btn) {
@@ -64,10 +64,10 @@
     var cls = a.kind === 'liability' ? 'down' : 'neutral';
     return '<div class="col-md-6 col-xl-4"><div class="account-card">' +
       '<div class="acc-top"><span class="cat-icon-circle" style="background:' + (a.kind === 'liability' ? 'var(--status-critical)' : 'var(--series-1)') + '"><i class="bi ' + a.icon + '"></i></span>' +
-      '<div><div style="font-weight:600;">' + Fmt.escapeHTML(a.name) + '</div><div class="text-muted-mw" style="font-size:12px;">' + (a.kind === 'liability' ? 'Liabilitas' : 'Aset') + '</div></div></div>' +
+      '<div><div style="font-weight:600;">' + Fmt.escapeHTML(a.name) + '</div><div class="text-muted-mw" style="font-size:12px;">' + (a.kind === 'liability' ? 'Liability' : 'Asset') + '</div></div></div>' +
       '<div class="amount-text ' + cls + '" style="font-size:20px;">' + Fmt.formatRupiah(a.balance) + '</div>' +
       '<div class="acc-actions">' +
-      '<button class="btn btn-sm btn-outline-secondary" data-action="adjust" data-id="' + a.id + '"><i class="bi bi-sliders me-1"></i>Sesuaikan</button>' +
+      '<button class="btn btn-sm btn-outline-secondary" data-action="adjust" data-id="' + a.id + '"><i class="bi bi-sliders me-1"></i>Adjust</button>' +
       '<button class="btn btn-sm btn-outline-secondary" data-action="edit-acc" data-id="' + a.id + '"><i class="bi bi-pencil"></i></button>' +
       '<button class="btn btn-sm btn-outline-secondary" data-action="delete-acc" data-id="' + a.id + '"><i class="bi bi-trash3"></i></button>' +
       '</div></div></div>';
@@ -81,16 +81,16 @@
     if (id) {
       var a = Store.getAccount(id);
       if (!a) return;
-      title.textContent = 'Edit Akun';
+      title.textContent = 'Edit Account';
       deleteBtn.classList.remove('d-none');
       document.getElementById('accId').value = a.id;
       document.getElementById('accName').value = a.name;
       document.getElementById('accGroup').value = a.group;
       document.getElementById('accBalance').value = Number(a.balance).toLocaleString('id-ID');
       document.getElementById('accBalance').disabled = true;
-      document.getElementById('accBalanceHint').textContent = "Gunakan tombol 'Sesuaikan' pada kartu akun untuk mengubah saldo.";
+      document.getElementById('accBalanceHint').textContent = "Use the 'Adjust' button on the account card to change the balance.";
     } else {
-      title.textContent = 'Tambah Akun';
+      title.textContent = 'Add Account';
       deleteBtn.classList.add('d-none');
       document.getElementById('accId').value = '';
       document.getElementById('accBalance').disabled = false;
@@ -110,7 +110,7 @@
     adjustModal.show();
   }
 
-  function kindForGroup(g) { return g === 'Kartu Kredit/Hutang' ? 'liability' : 'asset'; }
+  function kindForGroup(g) { return g === 'Credit Card/Debt' ? 'liability' : 'asset'; }
 
   document.addEventListener('DOMContentLoaded', async function () {
     var ready = await Store.init();
@@ -141,15 +141,15 @@
         }
         accountModal.hide();
       } catch (err) {
-        alert('Gagal menyimpan akun: ' + (err.message || err));
+        alert('Failed to save account: ' + (err.message || err));
       }
     });
 
     document.getElementById('accDeleteBtn').addEventListener('click', async function () {
       var id = document.getElementById('accId').value;
-      if (!id || !confirm('Hapus akun ini?')) return;
+      if (!id || !confirm('Delete this account?')) return;
       var res = await Store.deleteAccount(id);
-      if (!res.ok) alert('Akun tidak dapat dihapus karena masih memiliki riwayat transaksi.');
+      if (!res.ok) alert('This account cannot be deleted because it still has transaction history.');
       else accountModal.hide();
     });
 
@@ -162,7 +162,7 @@
         await Store.adjustBalance(id, newBalance, note);
         adjustModal.hide();
       } catch (err) {
-        alert('Gagal menyesuaikan saldo: ' + (err.message || err));
+        alert('Failed to adjust balance: ' + (err.message || err));
       }
     });
   });

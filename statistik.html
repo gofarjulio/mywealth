@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#141b2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="MyWealth">
-<title>Statistik & Analitik · MyWealth</title>
+<title>Statistics & Analytics · MyWealth</title>
 <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('mw_theme') || 'light');</script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -26,8 +26,8 @@
         <div class="col-lg-5">
           <div class="mw-card h-100">
             <div class="mw-card-header">
-              <div><h3>Pengeluaran per Kategori</h3><div class="subtitle" id="pieSubtitle">Periode berjalan</div></div>
-              <button class="btn btn-sm btn-outline-secondary table-toggle-btn" id="pieTableToggle">Tampilan Tabel</button>
+              <div><h3>Expenses by Category</h3><div class="subtitle" id="pieSubtitle">Current period</div></div>
+              <button class="btn btn-sm btn-outline-secondary table-toggle-btn" id="pieTableToggle">Table View</button>
             </div>
             <div class="d-flex flex-column align-items-center" id="pieChartWrap">
               <div style="max-width:230px;width:100%;"><canvas id="pieChart" height="230"></canvas></div>
@@ -35,26 +35,26 @@
             </div>
             <div class="table-responsive d-none" id="pieTableWrap">
               <table class="mw-table">
-                <thead><tr><th>Kategori</th><th class="text-end">Jumlah</th><th class="text-end">%</th></tr></thead>
+                <thead><tr><th>Category</th><th class="text-end">Amount</th><th class="text-end">%</th></tr></thead>
                 <tbody id="pieTableBody"></tbody>
               </table>
             </div>
-            <div class="empty-state d-none" id="pieEmpty"><i class="bi bi-pie-chart"></i>Belum ada pengeluaran periode ini.</div>
+            <div class="empty-state d-none" id="pieEmpty"><i class="bi bi-pie-chart"></i>No expenses for this period yet.</div>
           </div>
         </div>
         <div class="col-lg-7">
           <div class="mw-card h-100">
             <div class="mw-card-header">
-              <div><h3>Trend Arus Kas</h3><div class="subtitle">Pemasukan vs Pengeluaran per bulan</div></div>
+              <div><h3>Cash Flow Trend</h3><div class="subtitle">Income vs Expenses by month</div></div>
               <select class="form-select form-select-sm" id="trendMonths" style="width:auto;">
-                <option value="6">6 Bulan Terakhir</option>
-                <option value="12">12 Bulan Terakhir</option>
+                <option value="6">Last 6 Months</option>
+                <option value="12">Last 12 Months</option>
               </select>
             </div>
             <canvas id="trendChart" height="140"></canvas>
             <div class="d-flex gap-4 mt-3">
-              <span class="d-flex align-items-center gap-2" style="font-size:13px;"><span class="cat-dot" style="background:var(--series-6);width:12px;height:12px;"></span>Pemasukan</span>
-              <span class="d-flex align-items-center gap-2" style="font-size:13px;"><span class="cat-dot" style="background:var(--series-8);width:12px;height:12px;"></span>Pengeluaran</span>
+              <span class="d-flex align-items-center gap-2" style="font-size:13px;"><span class="cat-dot" style="background:var(--series-6);width:12px;height:12px;"></span>Income</span>
+              <span class="d-flex align-items-center gap-2" style="font-size:13px;"><span class="cat-dot" style="background:var(--series-8);width:12px;height:12px;"></span>Expenses</span>
             </div>
           </div>
         </div>
@@ -62,12 +62,12 @@
 
       <div class="mw-card">
         <div class="mw-card-header">
-          <div><h3>Laporan Ringkasan Bulanan</h3><div class="subtitle">Rekapitulasi arus kas per bulan</div></div>
-          <button class="btn btn-sm btn-primary" id="exportCsvBtn"><i class="bi bi-download me-1"></i>Ekspor CSV</button>
+          <div><h3>Monthly Summary Report</h3><div class="subtitle">Cash flow recap by month</div></div>
+          <button class="btn btn-sm btn-primary" id="exportCsvBtn"><i class="bi bi-download me-1"></i>Export CSV</button>
         </div>
         <div class="table-responsive">
           <table class="mw-table">
-            <thead><tr><th>Bulan</th><th class="text-end">Pemasukan</th><th class="text-end">Pengeluaran</th><th class="text-end">Selisih</th></tr></thead>
+            <thead><tr><th>Month</th><th class="text-end">Income</th><th class="text-end">Expenses</th><th class="text-end">Difference</th></tr></thead>
             <tbody id="recapTableBody"></tbody>
           </table>
         </div>

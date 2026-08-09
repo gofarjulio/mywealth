@@ -45,7 +45,7 @@
     }
     var res = await sb.from('family_members').select('*').eq('auth_user_id', session.user.id).maybeSingle();
     if (res.error || !res.data) {
-      alert('Akun ini sudah login tapi belum terhubung ke data keluarga manapun. Hubungi admin untuk menautkan akun.');
+      alert('This account is signed in but is not linked to any family data yet. Contact an admin to link the account.');
       await sb.auth.signOut();
       global.location.href = 'login.html';
       return null;
@@ -79,7 +79,7 @@
       familyId: familyId,
       memberId: member.id,
       settings: {
-        familyName: (famRes.data && famRes.data.name) || 'Keluarga',
+        familyName: (famRes.data && famRes.data.name) || 'Family',
         activeMemberId: member.id,
         activeMemberName: member.name
       },
@@ -125,7 +125,7 @@
   function getMembers() { return cache.members; }
   async function addMember(m) {
     var initials = (m.name || '?').trim().slice(0, 2).toUpperCase();
-    var payload = { family_id: cache.familyId, name: m.name, role: m.role || 'Anggota', initials: initials, email: m.email || null };
+    var payload = { family_id: cache.familyId, name: m.name, role: m.role || 'Member', initials: initials, email: m.email || null };
     var res = await sb.from('family_members').insert(payload);
     if (res.error) throw res.error;
     await fetchAll();
@@ -230,7 +230,7 @@
     var payload = {
       family_id: cache.familyId, tx_date: todayISO(), tx_time: '00:00', type: 'adjustment',
       amount: diff, category_id: null, account_id: id, to_account_id: null,
-      note: note || 'Penyesuaian saldo', created_by: cache.memberId
+      note: note || 'Balance adjustment', created_by: cache.memberId
     };
     var res = await sb.from('transactions').insert(payload);
     if (res.error) throw res.error;
@@ -309,23 +309,23 @@
       var day = (now.getDay() + 6) % 7;
       start = new Date(now); start.setDate(now.getDate() - day);
       end = new Date(start); end.setDate(start.getDate() + 6);
-      label = 'Minggu Ini';
+      label = 'This Week';
     } else if (key === 'last-month') {
       start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       end = new Date(now.getFullYear(), now.getMonth(), 0);
-      label = 'Bulan Lalu';
+      label = 'Last Month';
     } else if (key === 'this-year') {
       start = new Date(now.getFullYear(), 0, 1);
       end = new Date(now.getFullYear(), 11, 31);
-      label = 'Tahun Ini';
+      label = 'This Year';
     } else if (key === 'all') {
       start = new Date(2000, 0, 1);
       end = new Date(now.getFullYear() + 1, 0, 1);
-      label = 'Semua Waktu';
+      label = 'All Time';
     } else {
       start = new Date(now.getFullYear(), now.getMonth(), 1);
       end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      label = 'Bulan Ini';
+      label = 'This Month';
     }
     return { start: toISO(start), end: toISO(end), label: label };
   }
@@ -382,7 +382,7 @@
   }
 
   function monthLabel(y, m) {
-    var names = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    var names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return names[m] + ' ' + y;
   }
 

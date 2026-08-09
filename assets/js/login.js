@@ -20,14 +20,14 @@
       var password = document.getElementById('loginPassword').value;
 
       btn.disabled = true;
-      btn.textContent = 'Memproses...';
+      btn.textContent = 'Signing in...';
       document.getElementById('loginError').classList.add('d-none');
 
       sb.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
         if (res.error) {
-          showError('Email atau kata sandi salah.');
+          showError('Incorrect email or password.');
           btn.disabled = false;
-          btn.textContent = 'Masuk';
+          btn.textContent = 'Sign In';
           return;
         }
         window.location.href = 'index.html';

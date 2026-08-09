@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,7 +26,7 @@
         <div class="col-6 col-xl-3">
           <div class="mw-card stat-tile">
             <div class="stat-top">
-              <span class="stat-label">Total Pemasukan</span>
+              <span class="stat-label">Total Income</span>
               <span class="stat-icon icon-badge-income"><i class="bi bi-arrow-down-left"></i></span>
             </div>
             <div class="stat-value" id="statIncome">Rp0</div>
@@ -36,7 +36,7 @@
         <div class="col-6 col-xl-3">
           <div class="mw-card stat-tile">
             <div class="stat-top">
-              <span class="stat-label">Total Pengeluaran</span>
+              <span class="stat-label">Total Expenses</span>
               <span class="stat-icon icon-badge-expense"><i class="bi bi-arrow-up-right"></i></span>
             </div>
             <div class="stat-value" id="statExpense">Rp0</div>
@@ -46,7 +46,7 @@
         <div class="col-6 col-xl-3">
           <div class="mw-card stat-tile">
             <div class="stat-top">
-              <span class="stat-label">Saldo Periode Ini</span>
+              <span class="stat-label">Balance This Period</span>
               <span class="stat-icon icon-badge-balance"><i class="bi bi-wallet2"></i></span>
             </div>
             <div class="stat-value" id="statBalance">Rp0</div>
@@ -56,11 +56,11 @@
         <div class="col-6 col-xl-3">
           <div class="mw-card stat-tile">
             <div class="stat-top">
-              <span class="stat-label">Total Aset Keluarga</span>
+              <span class="stat-label">Total Family Assets</span>
               <span class="stat-icon icon-badge-asset"><i class="bi bi-gem"></i></span>
             </div>
             <div class="stat-value" id="statAssets">Rp0</div>
-            <div class="stat-delta flat" id="statAssetsSub">Aset dikurangi hutang</div>
+            <div class="stat-delta flat" id="statAssetsSub">Assets minus liabilities</div>
           </div>
         </div>
       </div>
@@ -70,33 +70,33 @@
           <div class="mw-card h-100">
             <div class="mw-card-header">
               <div>
-                <h3>Transaksi Terakhir</h3>
-                <div class="subtitle">8 transaksi terbaru dari seluruh akun</div>
+                <h3>Recent Transactions</h3>
+                <div class="subtitle">8 most recent transactions across all accounts</div>
               </div>
-              <a href="transaksi.html" class="btn btn-sm btn-outline-secondary">Lihat Semua</a>
+              <a href="transaksi.html" class="btn btn-sm btn-outline-secondary">View All</a>
             </div>
             <div class="table-responsive">
               <table class="mw-table">
-                <thead><tr><th>Tanggal</th><th>Kategori</th><th>Akun</th><th class="text-end">Jumlah</th></tr></thead>
+                <thead><tr><th>Date</th><th>Category</th><th>Account</th><th class="text-end">Amount</th></tr></thead>
                 <tbody id="recentTxBody"></tbody>
               </table>
             </div>
-            <div class="empty-state d-none" id="recentTxEmpty"><i class="bi bi-inbox"></i>Belum ada transaksi.</div>
+            <div class="empty-state d-none" id="recentTxEmpty"><i class="bi bi-inbox"></i>No transactions yet.</div>
           </div>
         </div>
         <div class="col-lg-5">
           <div class="mw-card h-100">
             <div class="mw-card-header">
               <div>
-                <h3>Pengeluaran per Kategori</h3>
-                <div class="subtitle" id="quickChartSubtitle">Periode berjalan</div>
+                <h3>Expenses by Category</h3>
+                <div class="subtitle" id="quickChartSubtitle">Current period</div>
               </div>
             </div>
             <div class="d-flex flex-column align-items-center">
               <div style="max-width:220px;width:100%;"><canvas id="quickChartCanvas" height="220"></canvas></div>
             </div>
             <ul class="mw-legend mt-3" id="quickChartLegend"></ul>
-            <div class="empty-state d-none" id="quickChartEmpty"><i class="bi bi-pie-chart"></i>Belum ada pengeluaran periode ini.</div>
+            <div class="empty-state d-none" id="quickChartEmpty"><i class="bi bi-pie-chart"></i>No expenses for this period yet.</div>
           </div>
         </div>
       </div>
@@ -104,10 +104,10 @@
       <div class="mw-card">
         <div class="mw-card-header">
           <div>
-            <h3>Saldo per Akun</h3>
-            <div class="subtitle">Ringkasan seluruh dompet dan aset</div>
+            <h3>Balance by Account</h3>
+            <div class="subtitle">Summary of all wallets and assets</div>
           </div>
-          <a href="akun.html" class="btn btn-sm btn-outline-secondary">Kelola Akun</a>
+          <a href="akun.html" class="btn btn-sm btn-outline-secondary">Manage Accounts</a>
         </div>
         <div class="d-flex gap-3" style="overflow-x:auto;" id="accountsStrip"></div>
       </div>

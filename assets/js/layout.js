@@ -4,18 +4,18 @@
 
   var NAV_ITEMS = [
     { key: 'dashboard', href: 'index.html', icon: 'bi-speedometer2', label: 'Dashboard' },
-    { key: 'transaksi', href: 'transaksi.html', icon: 'bi-arrow-left-right', label: 'Transaksi' },
-    { key: 'akun', href: 'akun.html', icon: 'bi-wallet2', label: 'Akun' },
-    { key: 'statistik', href: 'statistik.html', icon: 'bi-bar-chart-line', label: 'Statistik' },
-    { key: 'pengaturan', href: 'pengaturan.html', icon: 'bi-gear', label: 'Pengaturan' }
+    { key: 'transaksi', href: 'transaksi.html', icon: 'bi-arrow-left-right', label: 'Transactions' },
+    { key: 'akun', href: 'akun.html', icon: 'bi-wallet2', label: 'Accounts' },
+    { key: 'statistik', href: 'statistik.html', icon: 'bi-bar-chart-line', label: 'Statistics' },
+    { key: 'pengaturan', href: 'pengaturan.html', icon: 'bi-gear', label: 'Settings' }
   ];
 
   var PAGE_TITLES = {
     dashboard: 'Dashboard',
-    transaksi: 'Transaksi',
-    akun: 'Akun & Aset',
-    statistik: 'Statistik & Analitik',
-    pengaturan: 'Pengaturan'
+    transaksi: 'Transactions',
+    akun: 'Accounts & Assets',
+    statistik: 'Statistics & Analytics',
+    pengaturan: 'Settings'
   };
 
   function navHTML(active) {
@@ -28,8 +28,8 @@
   function brandHTML(collapsible) {
     return '<div class="sidebar-brand" id="sidebarBrand">' +
       '<img class="brand-mark" src="assets/icons/icon-192.png" alt="MyWealth">' +
-      '<div class="brand-text-wrap"><div class="brand-text">MyWealth</div><div class="brand-sub">Portal Keuangan Keluarga</div></div>' +
-      (collapsible ? '<button type="button" class="sidebar-toggle" id="sidebarToggleBtn" title="Tutup sidebar" aria-label="Tutup sidebar"><i class="bi bi-chevron-left"></i></button>' : '') +
+      '<div class="brand-text-wrap"><div class="brand-text">MyWealth</div><div class="brand-sub">Family Finance Portal</div></div>' +
+      (collapsible ? '<button type="button" class="sidebar-toggle" id="sidebarToggleBtn" title="Close sidebar" aria-label="Close sidebar"><i class="bi bi-chevron-left"></i></button>' : '') +
       '</div>';
   }
 
@@ -56,7 +56,7 @@
   function renderSidebar(active) {
     var desktop = document.getElementById('sidebarDesktop');
     if (desktop) {
-      desktop.innerHTML = brandHTML(true) + '<div class="nav-section-label">Menu Utama</div>' + navHTML(active);
+      desktop.innerHTML = brandHTML(true) + '<div class="nav-section-label">Main Menu</div>' + navHTML(active);
       desktop.classList.toggle('collapsed', isSidebarCollapsed());
       wireSidebarCollapse(desktop);
     }
@@ -66,11 +66,11 @@
 
   function periodOptions() {
     return [
-      { key: 'this-week', label: 'Minggu Ini' },
-      { key: 'this-month', label: 'Bulan Ini' },
-      { key: 'last-month', label: 'Bulan Lalu' },
-      { key: 'this-year', label: 'Tahun Ini' },
-      { key: 'all', label: 'Semua Waktu' }
+      { key: 'this-week', label: 'This Week' },
+      { key: 'this-month', label: 'This Month' },
+      { key: 'last-month', label: 'Last Month' },
+      { key: 'this-year', label: 'This Year' },
+      { key: 'all', label: 'All Time' }
     ];
   }
 
@@ -100,7 +100,7 @@
     var host = document.getElementById('topnav');
     if (!host) return;
     var settings = global.MW.Store.getSettings();
-    var active = { initials: (settings.activeMemberName || '?').trim().slice(0, 2).toUpperCase(), name: settings.activeMemberName || 'Anggota' };
+    var active = { initials: (settings.activeMemberName || '?').trim().slice(0, 2).toUpperCase(), name: settings.activeMemberName || 'Member' };
 
     var periodBlock = '';
     if (showPeriod) {
@@ -122,9 +122,9 @@
       '<h1 class="page-title d-none d-sm-block">' + (PAGE_TITLES[page] || '') + '</h1>' +
       '<div class="spacer"></div>' +
       periodBlock +
-      '<button class="btn-icon" id="themeToggleBtn" type="button" aria-label="Ganti tema"><i class="bi bi-moon-stars" id="themeIcon"></i></button>' +
+      '<button class="btn-icon" id="themeToggleBtn" type="button" aria-label="Toggle theme"><i class="bi bi-moon-stars" id="themeIcon"></i></button>' +
       '<button class="btn btn-primary d-flex align-items-center gap-2" id="quickAddBtn" style="border-radius:10px;">' +
-      '<i class="bi bi-plus-lg"></i><span class="d-none d-sm-inline">Tambah Transaksi</span></button>' +
+      '<i class="bi bi-plus-lg"></i><span class="d-none d-sm-inline">Add Transaction</span></button>' +
       '<div class="dropdown">' +
       '<button class="family-chip" type="button" data-bs-toggle="dropdown">' +
       '<span class="avatar-circle">' + active.initials + '</span>' +
@@ -134,10 +134,10 @@
       '<i class="bi bi-chevron-down" style="font-size:11px;color:var(--text-muted);"></i>' +
       '</button>' +
       '<ul class="dropdown-menu dropdown-menu-end">' +
-      '<li><h6 class="dropdown-header">Masuk sebagai ' + active.name + '</h6></li>' +
-      '<li><a class="dropdown-item" href="pengaturan.html"><i class="bi bi-people me-2"></i>Kelola Anggota</a></li>' +
+      '<li><h6 class="dropdown-header">Signed in as ' + active.name + '</h6></li>' +
+      '<li><a class="dropdown-item" href="pengaturan.html"><i class="bi bi-people me-2"></i>Manage Members</a></li>' +
       '<li><hr class="dropdown-divider"></li>' +
-      '<li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Keluar</a></li>' +
+      '<li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>' +
       '</ul></div>';
 
     if (showPeriod) {
@@ -158,7 +158,7 @@
     });
     host.querySelector('#logoutBtn').addEventListener('click', function (e) {
       e.preventDefault();
-      if (confirm('Keluar dari MyWealth?')) global.MW.Store.logout();
+      if (confirm('Log out of MyWealth?')) global.MW.Store.logout();
     });
 
     var icon = document.getElementById('themeIcon');
@@ -204,33 +204,33 @@
       '<div class="modal-dialog modal-dialog-centered">' +
       '<div class="modal-content">' +
       '<div class="modal-header">' +
-      '<h5 class="modal-title" id="txModalTitle">Tambah Transaksi</h5>' +
+      '<h5 class="modal-title" id="txModalTitle">Add Transaction</h5>' +
       '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>' +
       '</div>' +
       '<form id="txForm">' +
       '<div class="modal-body d-flex flex-column gap-3">' +
       '<input type="hidden" id="txId">' +
       '<div class="type-toggle">' +
-      '<input type="radio" name="txType" id="typeExpense" value="expense" checked><label class="for-expense" for="typeExpense"><i class="bi bi-arrow-down-circle me-1"></i>Pengeluaran</label>' +
-      '<input type="radio" name="txType" id="typeIncome" value="income"><label class="for-income" for="typeIncome"><i class="bi bi-arrow-up-circle me-1"></i>Pemasukan</label>' +
+      '<input type="radio" name="txType" id="typeExpense" value="expense" checked><label class="for-expense" for="typeExpense"><i class="bi bi-arrow-down-circle me-1"></i>Expense</label>' +
+      '<input type="radio" name="txType" id="typeIncome" value="income"><label class="for-income" for="typeIncome"><i class="bi bi-arrow-up-circle me-1"></i>Income</label>' +
       '<input type="radio" name="txType" id="typeTransfer" value="transfer"><label class="for-transfer" for="typeTransfer"><i class="bi bi-arrow-left-right me-1"></i>Transfer</label>' +
       '</div>' +
       '<div class="row g-2">' +
-      '<div class="col-7"><label class="form-label">Tanggal</label><input type="date" class="form-control" id="txDate" required></div>' +
-      '<div class="col-5"><label class="form-label">Waktu</label><input type="time" class="form-control" id="txTime"></div>' +
+      '<div class="col-7"><label class="form-label">Date</label><input type="date" class="form-control" id="txDate" required></div>' +
+      '<div class="col-5"><label class="form-label">Time</label><input type="time" class="form-control" id="txTime"></div>' +
       '</div>' +
-      '<div><label class="form-label">Jumlah</label>' +
+      '<div><label class="form-label">Amount</label>' +
       '<div class="rp-input-group"><span class="rp-prefix">Rp</span><input type="text" inputmode="numeric" class="form-control" id="txAmount" placeholder="0" required></div>' +
       '</div>' +
-      '<div id="accountFieldWrap"><label class="form-label" id="accountLabel">Akun</label><select class="form-select" id="txAccount"></select></div>' +
-      '<div id="toAccountFieldWrap" class="d-none"><label class="form-label">Ke Akun</label><select class="form-select" id="txToAccount"></select></div>' +
-      '<div id="categoryFieldWrap"><label class="form-label">Kategori</label><select class="form-select" id="txCategory"></select></div>' +
-      '<div><label class="form-label">Catatan (opsional)</label><textarea class="form-control" id="txNote" rows="2" placeholder="Deskripsi singkat..."></textarea></div>' +
+      '<div id="accountFieldWrap"><label class="form-label" id="accountLabel">Account</label><select class="form-select" id="txAccount"></select></div>' +
+      '<div id="toAccountFieldWrap" class="d-none"><label class="form-label">To Account</label><select class="form-select" id="txToAccount"></select></div>' +
+      '<div id="categoryFieldWrap"><label class="form-label">Category</label><select class="form-select" id="txCategory"></select></div>' +
+      '<div><label class="form-label">Note (optional)</label><textarea class="form-control" id="txNote" rows="2" placeholder="Short description..."></textarea></div>' +
       '</div>' +
       '<div class="modal-footer">' +
-      '<button type="button" class="btn btn-outline-danger me-auto d-none" id="txDeleteBtn"><i class="bi bi-trash3 me-1"></i>Hapus</button>' +
-      '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>' +
-      '<button type="submit" class="btn btn-primary">Simpan</button>' +
+      '<button type="button" class="btn btn-outline-danger me-auto d-none" id="txDeleteBtn"><i class="bi bi-trash3 me-1"></i>Delete</button>' +
+      '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>' +
+      '<button type="submit" class="btn btn-primary">Save</button>' +
       '</div>' +
       '</form></div></div></div>';
   }
@@ -243,11 +243,11 @@
     var catWrap = document.getElementById('categoryFieldWrap');
     var catSelect = document.getElementById('txCategory');
     if (type === 'transfer') {
-      accountLabel.textContent = 'Dari Akun';
+      accountLabel.textContent = 'From Account';
       toWrap.classList.remove('d-none');
       catWrap.classList.add('d-none');
     } else {
-      accountLabel.textContent = 'Akun';
+      accountLabel.textContent = 'Account';
       toWrap.classList.add('d-none');
       catWrap.classList.remove('d-none');
       var prev = keepValues ? catSelect.value : null;
@@ -293,7 +293,7 @@
       if (type === 'transfer') {
         payload.to_account_id = document.getElementById('txToAccount').value;
         if (payload.to_account_id === payload.account_id) {
-          alert('Akun asal dan tujuan transfer tidak boleh sama.');
+          alert('Source and destination accounts cannot be the same.');
           return;
         }
       } else {
@@ -302,27 +302,27 @@
       var id = document.getElementById('txId').value;
       var submitBtn = txModalEl.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Menyimpan...';
+      submitBtn.textContent = 'Saving...';
       try {
         if (id) await global.MW.Store.updateTransaction(id, payload);
         else await global.MW.Store.addTransaction(payload);
         txModalInstance.hide();
       } catch (err) {
-        alert('Gagal menyimpan transaksi: ' + (err.message || err));
+        alert('Failed to save transaction: ' + (err.message || err));
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Simpan';
+        submitBtn.textContent = 'Save';
       }
     });
 
     document.getElementById('txDeleteBtn').addEventListener('click', async function () {
       var id = document.getElementById('txId').value;
-      if (!id || !confirm('Hapus transaksi ini?')) return;
+      if (!id || !confirm('Delete this transaction?')) return;
       try {
         await global.MW.Store.deleteTransaction(id);
         txModalInstance.hide();
       } catch (err) {
-        alert('Gagal menghapus transaksi: ' + (err.message || err));
+        alert('Failed to delete transaction: ' + (err.message || err));
       }
     });
   }
@@ -336,7 +336,7 @@
     if (txId) {
       var t = global.MW.Store.getTransaction(txId);
       if (!t) return;
-      title.textContent = 'Edit Transaksi';
+      title.textContent = 'Edit Transaction';
       deleteBtn.classList.remove('d-none');
       var formType = (t.type === 'income' || t.type === 'expense' || t.type === 'transfer') ? t.type : 'expense';
       document.getElementById('txId').value = t.id;
@@ -350,7 +350,7 @@
       document.getElementById('txAmount').value = Math.abs(t.amount).toLocaleString('id-ID');
       document.getElementById('txNote').value = t.note || '';
     } else {
-      title.textContent = 'Tambah Transaksi';
+      title.textContent = 'Add Transaction';
       deleteBtn.classList.add('d-none');
       document.getElementById('txId').value = '';
       document.getElementById('txForm').reset();
@@ -378,9 +378,9 @@
       '<div class="modal-content">' +
       '<div class="modal-body text-center py-4">' +
       '<i class="bi bi-hourglass-split" style="font-size:28px;color:var(--status-warning);"></i>' +
-      '<h5 class="mt-3 mb-2">Sesi akan berakhir</h5>' +
-      '<p class="text-muted-mw mb-3">Tidak ada aktivitas. Anda akan keluar otomatis dalam <strong id="idleCountdown">30</strong> detik.</p>' +
-      '<button type="button" class="btn btn-primary" id="idleStayBtn">Tetap Masuk</button>' +
+      '<h5 class="mt-3 mb-2">Session about to expire</h5>' +
+      '<p class="text-muted-mw mb-3">No activity detected. You will be signed out automatically in <strong id="idleCountdown">30</strong> seconds.</p>' +
+      '<button type="button" class="btn btn-primary" id="idleStayBtn">Stay Signed In</button>' +
       '</div></div></div></div>';
     document.body.appendChild(wrap.firstElementChild);
     warningModalInstance = new bootstrap.Modal(document.getElementById('idleWarningModal'));

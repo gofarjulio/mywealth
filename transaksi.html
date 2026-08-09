@@ -36,39 +36,11 @@
         <button class="tx-tab" data-tab="note">Note</button>
       </div>
 
-      <div class="mw-card mb-3" id="filterPanel">
-        <div class="row g-2 align-items-end">
-          <div class="col-6 col-md-2">
-            <label class="form-label">Type</label>
-            <select class="form-select form-select-sm" id="filterType">
-              <option value="all">All</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-              <option value="transfer">Transfer</option>
-              <option value="adjustment">Adjustment</option>
-            </select>
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label">Category</label>
-            <select class="form-select form-select-sm" id="filterCategory"><option value="">All</option></select>
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label">Account</label>
-            <select class="form-select form-select-sm" id="filterAccount"><option value="">All</option></select>
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label">From Date</label>
-            <input type="date" class="form-control form-control-sm" id="filterStart">
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label">To Date</label>
-            <input type="date" class="form-control form-control-sm" id="filterEnd">
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label">Search Note</label>
-            <input type="text" class="form-control form-control-sm" id="filterSearch" placeholder="e.g. gas">
-          </div>
-        </div>
+      <div class="d-flex justify-content-end mb-3" id="filterPanel">
+        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" id="openFiltersBtn" data-bs-toggle="modal" data-bs-target="#filterModal">
+          <i class="bi bi-sliders"></i>Filters
+          <span class="badge rounded-pill bg-primary d-none" id="filterCountBadge">0</span>
+        </button>
       </div>
 
       <div class="tx-tabpane" id="tabDaily">
@@ -87,7 +59,6 @@
             </div>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-outline-secondary" id="exportExcelBtn"><i class="bi bi-file-earmark-excel me-1"></i>Export Excel</button>
-              <button class="btn btn-sm btn-outline-secondary" id="clearFiltersBtn">Reset Filters</button>
             </div>
           </div>
           <div id="txList"></div>
@@ -163,6 +134,56 @@
 </div>
 <div id="offcanvasHost"></div>
 <div id="quickAddModalHost"></div>
+
+<!-- Filters Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Filters</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body d-flex flex-column gap-3">
+        <div>
+          <label class="form-label">Type</label>
+          <select class="form-select form-select-sm" id="filterType">
+            <option value="all">All</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+            <option value="transfer">Transfer</option>
+            <option value="adjustment">Adjustment</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Category</label>
+          <select class="form-select form-select-sm" id="filterCategory"><option value="">All</option></select>
+        </div>
+        <div>
+          <label class="form-label">Account</label>
+          <select class="form-select form-select-sm" id="filterAccount"><option value="">All</option></select>
+        </div>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control form-control-sm" id="filterStart">
+          </div>
+          <div class="col-6">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control form-control-sm" id="filterEnd">
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Search Note</label>
+          <input type="text" class="form-control form-control-sm" id="filterSearch" placeholder="e.g. gas">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary me-auto" id="clearFiltersBtn">Reset Filters</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

@@ -360,7 +360,20 @@
   }
 
   // ---------------- Tab switching ----------------
+  function updateFilterBadge() {
+    var f = currentFilters();
+    var count = 0;
+    if (f.type && f.type !== 'all') count++;
+    if (f.category) count++;
+    if (f.account) count++;
+    if (f.q && f.q.trim()) count++;
+    var badge = document.getElementById('filterCountBadge');
+    badge.textContent = count;
+    badge.classList.toggle('d-none', count === 0);
+  }
+
   function renderActiveTab() {
+    updateFilterBadge();
     if (activeTab === 'daily') renderDaily();
     else if (activeTab === 'calendar') renderCalendar();
     else if (activeTab === 'monthly') renderMonthly();

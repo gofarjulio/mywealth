@@ -121,9 +121,21 @@
 
       <div class="tx-tabpane d-none" id="tabHistory">
         <div class="mw-card">
-          <div class="mw-card-header"><h3>Update History</h3></div>
-          <div id="assetHistoryList"></div>
-          <div class="empty-state d-none" id="assetHistoryEmpty"><i class="bi bi-clock-history"></i>No updates logged yet.</div>
+          <div class="mw-card-header">
+            <h3>Update History</h3>
+            <div class="tx-period-nav" style="margin-bottom:0;">
+              <button class="btn btn-sm btn-outline-secondary" id="historyPrevBtn"><i class="bi bi-chevron-left"></i></button>
+              <div class="tx-period-label" id="historyPeriodLabel"></div>
+              <button class="btn btn-sm btn-outline-secondary" id="historyNextBtn"><i class="bi bi-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="mw-table" id="historyTable" style="min-width:500px;">
+              <thead><tr id="historyTableHead"></tr></thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+          <div class="empty-state d-none" id="assetHistoryEmpty"><i class="bi bi-clock-history"></i>No updates logged for this month.</div>
         </div>
       </div>
 

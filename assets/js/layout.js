@@ -362,6 +362,24 @@
     txModalInstance.show();
   }
 
+  // -------------------- Auto-logout on inactivity --------------------
+  var IDLE_TIMEOUT_MS = 30000;
+  var idleTimer = null;
+
+  function resetIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      global.MW.Store.logout();
+    }, IDLE_TIMEOUT_MS);
+  }
+
+  function initIdleLogout() {
+    ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function (evt) {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+    resetIdleTimer();
+  }
+
   global.MW = global.MW || {};
   global.MW.Layout = {
     init: function (page, showPeriod) {
@@ -369,6 +387,7 @@
       renderSidebar(page);
       renderTopnav(page, !!showPeriod);
       initTransactionForm();
+      initIdleLogout();
     },
     accountOptionsHTML: accountOptionsHTML,
     categoryOptionsHTML: categoryOptionsHTML,
